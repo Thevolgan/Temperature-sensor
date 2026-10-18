@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Monitoramento de Sensores Meteorológicos</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0A0F1E}
+a{color:#7C9CFF}a:hover{color:#A9BEFF}
+button{font:inherit}
+@keyframes wxpulse{0%{box-shadow:0 0 0 0 rgba(61,214,163,.55)}70%{box-shadow:0 0 0 8px rgba(61,214,163,0)}100%{box-shadow:0 0 0 0 rgba(61,214,163,0)}}
+@keyframes wxcrit{0%{box-shadow:0 0 0 0 rgba(255,107,129,.6)}70%{box-shadow:0 0 0 12px rgba(255,107,129,0)}100%{box-shadow:0 0 0 0 rgba(255,107,129,0)}}
+@keyframes wxwarn{0%{box-shadow:0 0 0 0 rgba(255,181,71,.6)}70%{box-shadow:0 0 0 12px rgba(255,181,71,0)}100%{box-shadow:0 0 0 0 rgba(255,181,71,0)}}
+@keyframes wxtoast{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+.wx-live{animation:wxpulse 2s infinite}
+.wx-crit{animation:wxcrit 1.8s infinite}
+.wx-warn{animation:wxwarn 2.2s infinite}
+.wx-toast{animation:wxtoast .25s ease-out}
+.wx-row{transition:background .15s}
+.wx-row:hover{background:#18213F}
+.wx-ghost{transition:background .15s,border-color .15s}
+.wx-ghost:hover{background:#1A2445;border-color:#34437A}
+.wx-dot{transition:transform .15s}
+.wx-dot:hover{transform:translate(-50%,-50%) scale(1.15)}
+.wx-th:hover{color:#EEF1FA}
+.wx-search:focus-within{border-color:#7C9CFF}
+.wx-search input::placeholder{color:#6F7AA0}
+.wx-search input:focus{outline:none}
+button:focus-visible,input:focus-visible{outline:2px solid #7C9CFF;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; box-sizing: border-box; background: #0A0F1E; color: #EEF1FA; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; padding: 24px 32px">
+<div style="height: 100%; display: flex; flex-direction: column; gap: 16px">
+
+<header style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="width: 48px; height: 48px; border-radius: 14px; background: #141C38; border: 1px solid #243052; display: flex; align-items: center; justify-content: center; color: {{accent}}">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2"></path><path d="M5.6 5.6l1.4 1.4"></path><path d="M3 12h2"></path><path d="M16 12a4 4 0 1 0-7.4 2.1"></path><path d="M8 20h9a3 3 0 0 0 0-6h-.5A4.5 4.5 0 0 0 8 15.5 2.3 2.3 0 0 0 8 20z"></path></svg>
+</div>
+<div>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.015em">Rede de Sensores Meteorológicos</h1>
+<div style="color: #98A3C4; font-size: 13px; margin-top: 2px">Estações no solo e em edificações · telemetria em tempo real</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div role="group" aria-label="Intervalo de atualização" style="display: flex; align-items: center; gap: 2px; padding: 4px; background: #111833; border: 1px solid #243052; border-radius: 12px">
+<span style="color: #98A3C4; font-size: 12px; padding: 0 8px 0 6px">Atualizar a cada</span>
+<sc-for list="{{intervals}}" as="iv" hint-placeholder-count="3">
+<button onClick="{{iv.pick}}" aria-pressed="{{iv.pressed}}" style="min-height: 34px; min-width: 44px; padding: 0 10px; border-radius: 8px; border: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: {{iv.bg}}; color: {{iv.fg}}">{{iv.label}}</button>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 44px; box-sizing: border-box; padding: 0 16px; border: 1px solid #243052; border-radius: 12px; background: #111833">
+<span class="{{liveClass}}" style="width: 9px; height: 9px; border-radius: 50%; background: {{liveDot}}"></span>
+<span style="font-weight: 600; font-size: 13px">{{liveLabel}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; color: #98A3C4; font-size: 13px">{{clock}}</span>
+</div>
+<button class="wx-ghost" onClick="{{togglePause}}" style="height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #243052; background: #111833; color: #EEF1FA; cursor: pointer; display: flex; align-items: center; gap: 8px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{pauseIcon}}"></path></svg>
+<span>{{pauseLabel}}</span>
+</button>
+<button class="wx-ghost" onClick="{{exportCsv}}" style="height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #243052; background: #111833; color: #EEF1FA; cursor: pointer; display: flex; align-items: center; gap: 8px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+<span>Exportar CSV</span>
+</button>
+<button onClick="{{addSensor}}" style="height: 44px; padding: 0 18px; border-radius: 12px; border: none; background: {{accent}}; color: #0A0F1E; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+<span>Adicionar sensor</span>
+</button>
+</div>
+</header>
+
+<section aria-label="Resumo da rede" style="flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+<div style="background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="position: relative; width: 72px; height: 72px; flex: none">
+<svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true" style="transform: rotate(-90deg)"><circle cx="36" cy="36" r="30" fill="none" stroke="#1F2A4A" stroke-width="7"></circle><circle cx="36" cy="36" r="30" fill="none" stroke="#3DD6A3" stroke-width="7" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="{{kpi.onlineOffset}}" style="transition: stroke-dashoffset .6s"></circle></svg>
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 15px">{{kpi.onlinePct}}</div>
+</div>
+<div style="min-width: 0">
+<div style="color: #98A3C4; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em">Sensores online</div>
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 600; margin-top: 4px">{{kpi.online}}<span style="color: #6F7AA0; font-size: 18px"> / {{kpi.total}}</span></div>
+<div style="color: #98A3C4; font-size: 12px; margin-top: 2px">{{kpi.offlineText}}</div>
+</div>
+</div>
+<sc-for list="{{kpiTrends}}" as="k" hint-placeholder-count="3">
+<div style="background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="color: #98A3C4; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em">{{k.label}}</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: {{k.deltaBg}}; color: {{k.deltaFg}}">{{k.delta}}</span>
+</div>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div>
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 600">{{k.value}}<span style="color: #6F7AA0; font-size: 18px"> {{k.unit}}</span></div>
+<div style="color: #98A3C4; font-size: 12px; margin-top: 2px">{{k.sub}}</div>
+</div>
+<svg viewBox="0 0 120 40" preserveAspectRatio="none" aria-hidden="true" style="width: 120px; height: 40px; flex: none"><polygon points="{{k.area}}" fill="{{k.color}}" fill-opacity="0.14"></polygon><polyline points="{{k.line}}" fill="none" stroke="{{k.color}}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline></svg>
+</div>
+</div>
+</sc-for>
+<div style="background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="color: #98A3C4; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em">Alertas ativos</div>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 40px; font-weight: 600; line-height: 1; color: {{kpi.alertColor}}">{{kpi.alerts}}</div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end">
+<span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgba(255,107,129,0.14); color: #FF8597"><span style="width: 6px; height: 6px; border-radius: 50%; background: #FF6B81"></span>{{kpi.critical}} crítico(s)</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgba(255,181,71,0.14); color: #FFC56E"><span style="width: 6px; height: 6px; border-radius: 50%; background: #FFB547"></span>{{kpi.warn}} de atenção</span>
+</div>
+</div>
+<div style="color: #98A3C4; font-size: 12px">{{kpi.ackText}}</div>
+</div>
+</section>
+
+<div style="flex: 1 1 auto; min-height: 0; display: flex; gap: 16px; align-items: stretch">
+
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<section aria-label="Sensores" style="flex: none; background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px 12px 20px; border-bottom: 1px solid #1F2A4A">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Sensores <span style="color: #6F7AA0; font-weight: 400">{{rowCount}} de {{totalCount}}</span></h2>
+<div style="display: flex; align-items: center; gap: 10px">
+<label class="wx-search" style="display: flex; align-items: center; gap: 8px; height: 40px; box-sizing: border-box; padding: 0 12px; width: 280px; background: #0A0F1E; border: 1px solid #243052; border-radius: 10px; color: #98A3C4">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar sensor</span>
+<input type="search" value="{{query}}" onChange="{{setQuery}}" placeholder="Buscar por nome, local ou modelo" style="flex: 1; min-width: 0; background: transparent; border: none; color: #EEF1FA; font: inherit; font-size: 13px">
+</label>
+<div role="group" aria-label="Tipo de instalação" style="display: flex; gap: 2px; padding: 3px; background: #0A0F1E; border: 1px solid #243052; border-radius: 10px">
+<sc-for list="{{kindFilters}}" as="f" hint-placeholder-count="3">
+<button onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="height: 32px; padding: 0 12px; border-radius: 7px; border: none; cursor: pointer; font-size: 13px; background: {{f.bg}}; color: {{f.fg}}">{{f.label}}</button>
+</sc-for>
+</div>
+<div role="group" aria-label="Status" style="display: flex; gap: 2px; padding: 3px; background: #0A0F1E; border: 1px solid #243052; border-radius: 10px">
+<sc-for list="{{statusFilters}}" as="f" hint-placeholder-count="4">
+<button onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="height: 32px; padding: 0 12px; border-radius: 7px; border: none; cursor: pointer; font-size: 13px; background: {{f.bg}}; color: {{f.fg}}">{{f.label}}</button>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="overflow: hidden">
+<table style="width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 13px">
+<thead>
+<tr style="text-align: left; color: #98A3C4; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em">
+<sc-for list="{{headers}}" as="hd" hint-placeholder-count="12">
+<th aria-sort="{{hd.ariaSort}}" style="padding: 0; font-weight: 500; text-align: {{hd.align}}; position: sticky; top: 0; background: #111833; border-bottom: 1px solid #1F2A4A">
+<sc-if value="{{hd.sortable}}" hint-placeholder-val="{{ true }}">
+<button class="wx-th" onClick="{{hd.click}}" style="width: 100%; height: 38px; padding: 0 {{hd.pad}}; background: none; border: none; cursor: pointer; font: inherit; text-transform: uppercase; letter-spacing: 0.06em; color: {{hd.color}}; display: flex; align-items: center; gap: 4px; justify-content: {{hd.justify}}">{{hd.label}}<span style="font-size: 12px; width: 10px">{{hd.arrow}}</span></button>
+</sc-if>
+<sc-if value="{{hd.plain}}" hint-placeholder-val="{{ false }}">
+<div style="height: 38px; padding: 0 {{hd.pad}}; display: flex; align-items: center; justify-content: {{hd.justify}}">{{hd.label}}</div>
+</sc-if>
+</th>
+</sc-for>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<tr class="wx-row" onClick="{{r.select}}" style="border-top: 1px solid #1A2340; background: {{r.rowBg}}; box-shadow: {{r.rowMark}}; cursor: pointer">
+<td style="padding: 7px 12px 7px 20px">
+<button onClick="{{r.select}}" style="background: none; border: none; padding: 0; color: #EEF1FA; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px">
+<span style="width: 32px; height: 32px; border-radius: 10px; flex: none; display: flex; align-items: center; justify-content: center; background: {{r.kindBg}}; color: {{r.kindFg}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.kindIcon}}"></path></svg>
+</span>
+<span>
+<span style="display: block; font-weight: 600">{{r.name}}</span>
+<span style="display: block; font-family: 'IBM Plex Mono', monospace; color: #6F7AA0; font-size: 12px">{{r.id}} · {{r.model}}</span>
+</span>
+</button>
+</td>
+<td style="padding: 7px 12px">
+<div>{{r.site}}</div>
+<div style="color: #98A3C4; font-size: 12px; margin-top: 2px">{{r.place}}</div>
+</td>
+<td style="padding: 7px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 15px; color: {{r.tColor}}">{{r.t}}</td>
+<td style="padding: 7px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace">{{r.h}}</td>
+<td style="padding: 7px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace">{{r.p}}</td>
+<td style="padding: 7px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; color: {{r.windColor}}">
+<span style="display: inline-flex; align-items: center; gap: 6px">{{r.w}}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: rotate({{r.windDeg}}deg); transition: transform .6s; color: #98A3C4"><path d="M12 20V4"></path><path d="M6 10l6-6 6 6"></path></svg><span style="color: #98A3C4; width: 22px; text-align: left">{{r.wd}}</span></span>
+</td>
+<td style="padding: 7px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; color: {{r.rainColor}}">{{r.rain}}</td>
+<td style="padding: 7px 12px">
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="width: 48px; height: 6px; border-radius: 3px; background: #1F2A4A; overflow: hidden"><div style="height: 6px; border-radius: 3px; width: {{r.batW}}; background: {{r.batColor}}"></div></div>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{r.batText}}">{{r.bat}}</span>
+</div>
+</td>
+<td style="padding: 7px 12px">
+<div style="display: flex; align-items: flex-end; gap: 2px; height: 14px" aria-label="{{r.sigLabel}}" role="img">
+<sc-for list="{{r.bars}}" as="b" hint-placeholder-count="4">
+<span style="width: 4px; border-radius: 1px; height: {{b.h}}; background: {{b.c}}"></span>
+</sc-for>
+</div>
+</td>
+<td style="padding: 7px 12px">
+<span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: {{r.stBg}}; color: {{r.stFg}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{r.stFg}}"></span>{{r.stLabel}}</span>
+</td>
+<td style="padding: 7px 20px 7px 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; color: #98A3C4; font-size: 12px">{{r.ago}}</td>
+</tr>
+</sc-for>
+<sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
+<tr><td colspan="11" style="padding: 48px; text-align: center; color: #98A3C4">Nenhum sensor encontrado com esses filtros.</td></tr>
+</sc-if>
+</tbody>
+</table>
+</div>
+</section>
+
+<div style="flex: 1 1 auto; min-height: 0; display: flex; gap: 16px">
+
+<section aria-label="Mapa dos sensores" style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="flex: none; display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid #1F2A4A">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Mapa da rede</h2>
+<div style="display: flex; align-items: center; gap: 14px; color: #98A3C4; font-size: 12px">
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; border: 2px solid #98A3C4; box-sizing: border-box"></span>Solo</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 2px; border: 2px solid #98A3C4; box-sizing: border-box"></span>Edifício</span>
+</div>
+</div>
+<div style="position: relative; flex: 1 1 auto; min-height: 0; background: #0D1328">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<defs><pattern id="wxgrid" width="5" height="10" patternUnits="userSpaceOnUse"><path d="M5 0H0V10" fill="none" stroke="#18213F" stroke-width="0.3" vector-effect="non-scaling-stroke"></path></pattern></defs>
+<rect width="100" height="100" fill="url(#wxgrid)"></rect>
+<path d="M78 0 C 86 20, 74 38, 88 52 S 92 82, 84 100 L 100 100 L 100 0 Z" fill="#132447"></path>
+<path d="M78 0 C 86 20, 74 38, 88 52 S 92 82, 84 100" fill="none" stroke="#1E3766" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+<path d="M0 62 C 20 58, 40 70, 60 60 S 76 52, 86 55" fill="none" stroke="#1A2445" stroke-width="6" vector-effect="non-scaling-stroke"></path>
+<path d="M30 0 C 34 30, 28 60, 36 100" fill="none" stroke="#1A2445" stroke-width="4" vector-effect="non-scaling-stroke"></path>
+<rect x="44" y="70" width="10" height="10" rx="1" fill="#151E3B"></rect>
+<rect x="56" y="74" width="7" height="12" rx="1" fill="#151E3B"></rect>
+<rect x="40" y="18" width="12" height="9" rx="1" fill="#151E3B"></rect>
+</svg>
+<sc-for list="{{mapDots}}" as="m" hint-placeholder-count="8">
+<button class="wx-dot" onClick="{{m.select}}" aria-label="{{m.aria}}" style="position: absolute; left: {{m.x}}; top: {{m.y}}; transform: translate(-50%, -50%); width: 36px; height: 36px; padding: 0; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center">
+<span class="{{m.pulse}}" style="width: {{m.size}}; height: {{m.size}}; border-radius: {{m.radius}}; background: {{m.fill}}; border: 2px solid {{m.ring}}; box-sizing: border-box"></span>
+<span style="position: absolute; left: 30px; top: 50%; transform: translateY(-50%); white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; background: {{m.tagBg}}; color: {{m.tagFg}}">{{m.label}}</span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Alertas e eventos" style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="flex: none; display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid #1F2A4A">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Alertas e eventos</h2>
+<button class="wx-ghost" onClick="{{ackAll}}" style="height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #243052; background: transparent; color: #C7CFE6; cursor: pointer; font-size: 12px">Reconhecer todos</button>
+</div>
+<div style="flex: 1 1 auto; min-height: 0; overflow: hidden">
+<sc-for list="{{events}}" as="e" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 18px; border-top: 1px solid #18213F; opacity: {{e.opacity}}">
+<span style="flex: none; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: {{e.bg}}; color: {{e.color}}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{e.icon}}"></path></svg>
+</span>
+<button onClick="{{e.select}}" style="flex: 1 1 auto; min-width: 0; text-align: left; background: none; border: none; padding: 0; color: #EEF1FA; cursor: pointer">
+<span style="display: flex; gap: 8px; align-items: baseline">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #98A3C4">{{e.id}}</span>
+<span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.title}}</span>
+</span>
+<span style="display: block; color: #98A3C4; font-size: 12px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.detail}}</span>
+</button>
+<span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6F7AA0">{{e.time}}</span>
+<sc-if value="{{e.canAck}}" hint-placeholder-val="{{ true }}">
+<button class="wx-ghost" onClick="{{e.ack}}" style="flex: none; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid #243052; background: transparent; color: #C7CFE6; cursor: pointer; font-size: 12px">Reconhecer</button>
+</sc-if>
+<sc-if value="{{e.isAcked}}" hint-placeholder-val="{{ false }}">
+<span style="flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #3DD6A3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Reconhecido</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+</div>
+
+<aside aria-label="Sensor selecionado" style="flex: 0 0 520px; min-height: 0; overflow: hidden; background: #111833; border: 1px solid #1F2A4A; border-radius: 16px; display: flex; flex-direction: column; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04)">
+<div style="padding: 18px 20px 0">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: 'IBM Plex Mono', monospace; color: #98A3C4; font-size: 12px">{{d.id}}</span>
+<span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: {{d.kindBg}}; color: {{d.kindFg}}">{{d.kind}}</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: {{d.stBg}}; color: {{d.stFg}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{d.stFg}}"></span>{{d.stLabel}}</span>
+</div>
+<div style="display: flex; gap: 6px">
+<button class="wx-ghost" onClick="{{prevSensor}}" aria-label="Sensor anterior" style="width: 36px; height: 36px; border-radius: 10px; border: 1px solid #243052; background: transparent; color: #C7CFE6; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<button class="wx-ghost" onClick="{{nextSensor}}" aria-label="Próximo sensor" style="width: 36px; height: 36px; border-radius: 10px; border: 1px solid #243052; background: transparent; color: #C7CFE6; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+<h2 style="margin: 10px 0 2px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em">{{d.name}}</h2>
+<div style="color: #98A3C4; font-size: 13px">{{d.site}} · {{d.place}}</div>
+<div role="tablist" aria-label="Detalhes do sensor" style="display: flex; gap: 20px; margin-top: 14px; border-bottom: 1px solid #1F2A4A">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+<button role="tab" aria-selected="{{tb.selected}}" onClick="{{tb.pick}}" style="height: 40px; padding: 0 2px; background: none; border: none; border-bottom: 2px solid {{tb.line}}; margin-bottom: -1px; color: {{tb.fg}}; font-weight: 600; font-size: 13px; cursor: pointer">{{tb.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{showReadings}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px">
+
+<div style="display: flex; gap: 12px">
+<div style="flex: 1 1 auto; background: #0D1328; border: 1px solid #1F2A4A; border-radius: 14px; padding: 14px 16px">
+<div style="color: #98A3C4; font-size: 12px">Temperatura agora</div>
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 44px; font-weight: 600; line-height: 1.1; margin-top: 4px; color: {{d.tColor}}">{{d.t}}<span style="font-size: 20px; color: #6F7AA0"> °C</span></div>
+<div style="color: #98A3C4; font-size: 12px; margin-top: 4px">Sensação {{d.feels}} °C · orvalho {{d.dew}} °C</div>
+</div>
+<sc-for list="{{d.rings}}" as="rg" hint-placeholder-count="2">
+<div style="flex: none; width: 108px; background: #0D1328; border: 1px solid #1F2A4A; border-radius: 14px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="position: relative; width: 68px; height: 68px">
+<svg width="68" height="68" viewBox="0 0 72 72" aria-hidden="true" style="transform: rotate(-90deg)"><circle cx="36" cy="36" r="30" fill="none" stroke="#1F2A4A" stroke-width="7"></circle><circle cx="36" cy="36" r="30" fill="none" stroke="{{rg.color}}" stroke-width="7" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="{{rg.offset}}" style="transition: stroke-dashoffset .6s"></circle></svg>
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 15px">{{rg.value}}</div>
+</div>
+<div style="color: #98A3C4; font-size: 12px">{{rg.label}}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{d.metrics}}" as="m" hint-placeholder-count="4">
+<div style="background: #0D1328; border: 1px solid #1F2A4A; border-radius: 12px; padding: 10px 12px">
+<div style="color: #98A3C4; font-size: 12px">{{m.label}}</div>
+<div style="display: flex; align-items: baseline; gap: 4px; margin-top: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600">{{m.value}}</span>
+<span style="color: #6F7AA0; font-size: 12px">{{m.unit}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="background: #0D1328; border: 1px solid #1F2A4A; border-radius: 14px; padding: 12px 14px 10px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="color: #C7CFE6; font-size: 13px; font-weight: 600">Histórico · últimas {{d.points}} leituras</span>
+<div role="group" aria-label="Grandeza do gráfico" style="display: flex; gap: 2px; padding: 2px; background: #111833; border: 1px solid #1F2A4A; border-radius: 8px">
+<sc-for list="{{chartTabs}}" as="ct" hint-placeholder-count="4">
+<button onClick="{{ct.pick}}" aria-pressed="{{ct.pressed}}" style="height: 28px; padding: 0 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; background: {{ct.bg}}; color: {{ct.fg}}">{{ct.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; gap: 8px; margin-top: 10px">
+<div style="flex: none; width: 40px; height: 120px; display: flex; flex-direction: column; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6F7AA0; text-align: right">
+<span>{{chart.hi}}</span><span>{{chart.mid}}</span><span>{{chart.lo}}</span>
+</div>
+<div onMouseMove="{{chartMove}}" onMouseLeave="{{chartLeave}}" style="position: relative; flex: 1 1 auto; height: 120px; cursor: crosshair">
+<svg viewBox="0 0 400 140" preserveAspectRatio="none" role="img" aria-label="{{chart.aria}}" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<line x1="0" y1="6" x2="400" y2="6" stroke="#1A2340" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+<line x1="0" y1="70" x2="400" y2="70" stroke="#1A2340" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+<line x1="0" y1="134" x2="400" y2="134" stroke="#1A2340" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+<polygon points="{{chart.area}}" fill="{{chart.color}}" fill-opacity="0.16"></polygon>
+<polyline points="{{chart.line}}" fill="none" stroke="{{chart.color}}" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+</svg>
+<sc-if value="{{chart.hasHover}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; bottom: 0; left: {{chart.hx}}; width: 1px; background: #34437A; pointer-events: none"></div>
+<div style="position: absolute; left: {{chart.hx}}; top: {{chart.hy}}; width: 10px; height: 10px; border-radius: 50%; background: #0D1328; border: 2px solid {{chart.color}}; transform: translate(-50%, -50%); pointer-events: none"></div>
+<div style="position: absolute; left: {{chart.tipX}}; top: -6px; transform: translateX({{chart.tipShift}}); padding: 6px 10px; border-radius: 8px; background: #1A2445; border: 1px solid #34437A; pointer-events: none; white-space: nowrap">
+<div style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px">{{chart.hv}}</div>
+<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #98A3C4">{{chart.ht}}</div>
+</div>
+</sc-if>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; margin: 6px 0 0 48px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6F7AA0">
+<span>{{chart.t0}}</span><span>{{chart.t1}}</span>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 18px; background: #0D1328; border: 1px solid #1F2A4A; border-radius: 14px; padding: 12px 16px">
+<div style="position: relative; width: 96px; height: 96px; flex: none">
+<svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
+<circle cx="48" cy="48" r="40" fill="none" stroke="#1F2A4A" stroke-width="2"></circle>
+<circle cx="48" cy="48" r="30" fill="none" stroke="#18213F" stroke-width="1"></circle>
+<text x="48" y="15" text-anchor="middle" fill="#C7CFE6" font-size="10" font-family="IBM Plex Mono, monospace" font-weight="600">N</text>
+<text x="85" y="52" text-anchor="middle" fill="#6F7AA0" font-size="10" font-family="IBM Plex Mono, monospace">L</text>
+<text x="48" y="89" text-anchor="middle" fill="#6F7AA0" font-size="10" font-family="IBM Plex Mono, monospace">S</text>
+<text x="11" y="52" text-anchor="middle" fill="#6F7AA0" font-size="10" font-family="IBM Plex Mono, monospace">O</text>
+</svg>
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: {{accent}}; transform: rotate({{d.windDeg}}deg); transition: transform .6s">
+<svg width="40" height="56" viewBox="0 0 40 56" aria-hidden="true"><path d="M20 2 L30 22 L22 19 L22 54 L18 54 L18 19 L10 22 Z" fill="currentColor"></path></svg>
+</div>
+</div>
+<div style="flex: 1 1 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px">
+<div><div style="color: #98A3C4; font-size: 12px">Velocidade</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600">{{d.wind}} <span style="font-size: 12px; color: #6F7AA0">m/s</span></div></div>
+<div><div style="color: #98A3C4; font-size: 12px">Rajada</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600">{{d.gust}} <span style="font-size: 12px; color: #6F7AA0">m/s</span></div></div>
+<div><div style="color: #98A3C4; font-size: 12px">Direção</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600">{{d.wd}} · {{d.windFrom}}°</div></div>
+<div><div style="color: #98A3C4; font-size: 12px">Escala Beaufort</div><div style="font-size: 14px; font-weight: 600">{{d.beaufort}}</div></div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showDevice}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{d.info}}" as="i" hint-placeholder-count="10">
+<div style="background: #0D1328; border: 1px solid #1F2A4A; border-radius: 12px; padding: 10px 12px">
+<div style="color: #98A3C4; font-size: 12px">{{i.k}}</div>
+<div style="margin-top: 3px; font-weight: 500">{{i.v}}</div>
+</div>
+</sc-for>
+</div>
+<div>
+<h3 style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: #C7CFE6">Ações remotas</h3>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{actions}}" as="ac" hint-placeholder-count="3">
+<button class="wx-ghost" onClick="{{ac.run}}" style="min-height: 44px; border-radius: 10px; border: 1px solid #243052; background: #0D1328; color: #EEF1FA; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ac.icon}}"></path></svg>{{ac.label}}
+</button>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+</aside>
+</div>
+</div>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div class="wx-toast" role="status" style="position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 12px; background: #1A2445; border: 1px solid #34437A; box-shadow: 0 12px 32px rgba(0,0,0,0.45)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3DD6A3" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>
+<span style="font-weight: 500">{{toast}}</span>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#7C9CFF","options":["#7C9CFF","#5CC8E0","#3DD6A3","#FFB547"]},"$preview":{"width":1920,"height":1080}}'>
+const WX_SENSORS = [
+  { id: 'WS-01', name: 'Estação Campo Norte', model: 'Vaisala WXT536', kind: 'Solo', site: 'Campo Norte', place: 'Mastro, 2 m do solo', lat: -3.0981, lon: -60.0213, fw: '3.86', installed: '12/03/2025', power: 'Solar + Li-íon', serial: 'VX536-20931', t: 29.4, h: 78, p: 1009.8, w: 3.2, deg: 45, rain: 0.0, uv: 8, sol: 712, bat: 96, sig: -64, offline: false },
+  { id: 'WS-02', name: 'Pluviômetro Margem do Rio', model: 'Campbell ClimaVue 50', kind: 'Solo', site: 'Margem Leste do Rio', place: 'Mastro, 3 m do solo', lat: -3.1102, lon: -59.9987, fw: '1.12', installed: '02/06/2025', power: 'Solar + Li-íon', serial: 'CV50-11873', t: 28.1, h: 84, p: 1010.2, w: 2.1, deg: 90, rain: 1.2, uv: 5, sol: 480, bat: 88, sig: -71, offline: false },
+  { id: 'WS-03', name: 'Cobertura da Sede', model: 'Lufft WS600-UMB', kind: 'Edifício', site: 'Torre Sede', place: 'Cobertura, 18º andar', lat: -3.1190, lon: -60.0217, fw: '2.14', installed: '20/11/2024', power: 'Rede elétrica (PoE)', serial: 'LF600-55102', t: 31.2, h: 66, p: 1008.6, w: 6.4, deg: 30, rain: 0.0, uv: 9, sol: 805, bat: 100, sig: -58, offline: false },
+  { id: 'WS-04', name: 'Telhado do Armazém', model: 'Gill MaxiMet GMX600', kind: 'Edifício', site: 'Centro Logístico', place: 'Telhado, 3º andar', lat: -3.0749, lon: -60.0402, fw: '4.01', installed: '08/01/2025', power: 'Rede + nobreak', serial: 'GMX6-30077', t: 32.0, h: 61, p: 1008.9, w: 9.6, deg: 10, rain: 0.0, uv: 9, sol: 790, bat: 100, sig: -62, offline: false },
+  { id: 'WS-05', name: 'Estação Estacionamento', model: 'Davis Vantage Pro2', kind: 'Solo', site: 'Estacionamento B', place: 'Poste, 3 m do solo', lat: -3.1255, lon: -60.0128, fw: '3.2', installed: '15/08/2023', power: 'Solar + NiMH', serial: 'DVP2-88214', t: 33.5, h: 58, p: 1009.1, w: 2.8, deg: 135, rain: 0.0, uv: 10, sol: 840, bat: 74, sig: -69, offline: false },
+  { id: 'WS-06', name: 'Estação Portão Sul', model: 'Davis Vantage Pro2', kind: 'Solo', site: 'Portão Sul', place: 'Mastro, 2 m do solo', lat: -3.1342, lon: -60.0351, fw: '3.2', installed: '15/08/2023', power: 'Solar + NiMH', serial: 'DVP2-88219', t: 30.7, h: 72, p: 1009.5, w: 3.9, deg: 160, rain: 0.4, uv: 7, sol: 650, bat: 18, sig: -78, offline: false },
+  { id: 'WS-07', name: 'Fachada do Laboratório', model: 'Vaisala WXT536', kind: 'Edifício', site: 'Laboratório de Pesquisa', place: 'Fachada leste, 6º andar', lat: -3.1011, lon: -60.0105, fw: '3.86', installed: '30/09/2025', power: 'Rede elétrica (PoE)', serial: 'VX536-21544', t: 30.4, h: 70, p: 1008.8, w: 4.7, deg: 70, rain: 0.0, uv: 6, sol: 560, bat: 100, sig: -60, offline: false },
+  { id: 'WS-08', name: 'Estação da Encosta', model: 'METER ATMOS 41', kind: 'Solo', site: 'Encosta Oeste', place: 'Mastro, 2 m do solo', lat: -3.0876, lon: -60.0699, fw: '1.4', installed: '27/04/2024', power: 'Solar + Li-íon', serial: 'AT41-07731', t: 27.6, h: 81, p: 1010.6, w: 1.9, deg: 200, rain: 0.0, uv: 4, sol: 390, bat: 41, sig: -95, offline: true }
+];
+const WX_DIRS = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO'];
+const WX_HIST = 40;
+const WX_C = { ok: '#3DD6A3', warn: '#FFB547', bad: '#FF6B81', muted: '#98A3C4', dim: '#6F7AA0', text: '#EEF1FA', line: '#1F2A4A' };
+const WX_METRICS = {
+  t: { label: 'Temp.', name: 'Temperatura', unit: '°C', dec: 1, color: '#FF9F6B' },
+  h: { label: 'Umidade', name: 'Umidade', unit: '%', dec: 0, color: '#5CC8E0' },
+  p: { label: 'Pressão', name: 'Pressão', unit: 'hPa', dec: 1, color: '#B79CFF' },
+  w: { label: 'Vento', name: 'Vento', unit: 'm/s', dec: 1, color: '#3DD6A3' }
+};
+const WX_ICON = {
+  ground: 'M12 3v14M8 7h8M5 21h14M9 17l-3 4M15 17l3 4',
+  building: 'M4 21V5l8-3v19M12 9h8v12M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2M2 21h20',
+  crit: 'M12 3l10 18H2zM12 10v5M12 18h.01',
+  warn: 'M12 8v5M12 16h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z',
+  info: 'M12 11v6M12 7h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z'
+};
+
+function wxClamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function wxN(v, n) { return v.toFixed(n).replace('.', ','); }
+function wxPad(n) { return String(n).padStart(2, '0'); }
+function wxTime(d) { return wxPad(d.getHours()) + ':' + wxPad(d.getMinutes()) + ':' + wxPad(d.getSeconds()); }
+function wxDir(deg) { return WX_DIRS[Math.round(((deg % 360) + 360) % 360 / 45) % 8]; }
+function wxAgo(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  if (s < 60) return 'há ' + s + ' s';
+  if (s < 3600) return 'há ' + Math.floor(s / 60) + ' min';
+  return 'há ' + Math.floor(s / 3600) + ' h';
+}
+function wxDew(t, h) { const a = 17.62, b = 243.12; const g = Math.log(h / 100) + a * t / (b + t); return b * g / (a - g); }
+function wxFeels(t, h) { return t + 0.33 * (h / 100 * 6.105 * Math.exp(17.27 * t / (237.7 + t))) - 4; }
+function wxBeaufort(w) {
+  const lim = [0.3, 1.6, 3.4, 5.5, 8.0, 10.8, 13.9, 17.2, 20.8];
+  const names = ['Calmaria', 'Bafagem', 'Aragem', 'Fraco', 'Moderado', 'Fresco', 'Muito fresco', 'Forte', 'Muito forte', 'Duro'];
+  let i = 0; while (i < lim.length && w >= lim[i]) i++;
+  return i + ' · ' + names[i];
+}
+function wxTempColor(t) { return t >= 33 ? '#FF9F6B' : t >= 31 ? '#FFC56E' : WX_C.text; }
+function wxStatus(s) {
+  if (s.offline) return 'offline';
+  if (s.bat < 25 || s.w > 9 || s.sig < -85) return 'warning';
+  return 'online';
+}
+const WX_ST = {
+  online: { label: 'Online', fg: '#3DD6A3', bg: 'rgba(61,214,163,0.12)', rank: 0 },
+  warning: { label: 'Atenção', fg: '#FFB547', bg: 'rgba(255,181,71,0.12)', rank: 1 },
+  offline: { label: 'Offline', fg: '#FF6B81', bg: 'rgba(255,107,129,0.12)', rank: 2 }
+};
+function wxSpark(vals, w, h, pad) {
+  const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  const span = Math.max(0.0001, hi - lo);
+  const pts = vals.map((v, k) => (k * w / (vals.length - 1)).toFixed(1) + ',' + (h - pad - ((v - lo) / span) * (h - pad * 2)).toFixed(1));
+  return { line: pts.join(' '), area: '0,' + h + ' ' + pts.join(' ') + ' ' + w + ',' + h, lo: lo, hi: hi };
+}
+
+function wxInit() {
+  const now = Date.now();
+  const times = [];
+  for (let k = 0; k < WX_HIST; k++) times.push(now - (WX_HIST - 1 - k) * 2000);
+  const sensors = WX_SENSORS.map((s, i) => {
+    const hist = { t: [], h: [], p: [], w: [] };
+    for (let k = 0; k < WX_HIST; k++) {
+      const ph = (k + i * 3) / 5;
+      hist.t.push(s.t - 0.6 + Math.sin(ph) * 0.5 + (k / WX_HIST) * 0.6);
+      hist.h.push(s.h + 1.5 - Math.sin(ph) * 1.6 - (k / WX_HIST) * 1.5);
+      hist.p.push(s.p + Math.cos(ph / 2) * 0.25);
+      hist.w.push(Math.max(0, s.w + Math.sin(ph * 1.7) * 1.1));
+    }
+    hist.t[WX_HIST - 1] = s.t; hist.h[WX_HIST - 1] = s.h; hist.p[WX_HIST - 1] = s.p; hist.w[WX_HIST - 1] = s.w;
+    return Object.assign({}, s, { gust: s.w * 1.45, hist: hist, seen: s.offline ? now - 14 * 60 * 1000 : now - (i % 4) * 1000 });
+  });
+  return {
+    sensors: sensors, times: times, selected: 'WS-03', kind: 'Todos', status: 'Todos', query: '',
+    sortKey: 'status', sortDir: -1, tab: 'readings', metric: 't', hover: -1, acked: {},
+    paused: false, interval: 2, now: now, start: now, toast: '', added: 0
+  };
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = wxInit();
+  }
+  componentDidMount() { this.wxSchedule(); }
+  componentWillUnmount() { if (this.wxTimer) clearInterval(this.wxTimer); if (this.wxToastT) clearTimeout(this.wxToastT); }
+  wxSchedule() {
+    if (this.wxTimer) clearInterval(this.wxTimer);
+    this.wxTimer = setInterval(() => this.wxTick(), (this.state.interval || 2) * 1000);
+  }
+  wxNotify(msg) {
+    if (this.wxToastT) clearTimeout(this.wxToastT);
+    this.setState({ toast: msg });
+    this.wxToastT = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+  wxTick() {
+    const now = Date.now();
+    if (this.state.paused) { this.setState({ now: now }); return; }
+    const push = (arr, v) => arr.slice(1).concat([v]);
+    const sensors = this.state.sensors.map((s) => {
+      if (s.offline) return s;
+      const t = s.t + (Math.random() - 0.5) * 0.3;
+      const h = wxClamp(s.h + (Math.random() - 0.5) * 1.2, 30, 100);
+      const p = s.p + (Math.random() - 0.5) * 0.2;
+      const w = wxClamp(s.w + (Math.random() - 0.5) * 1.1, 0, 18);
+      const deg = s.deg + (Math.random() - 0.5) * 18;
+      const rain = s.rain > 0 ? wxClamp(s.rain + (Math.random() - 0.5) * 0.3, 0, 30) : s.rain;
+      const sol = wxClamp(s.sol + (Math.random() - 0.5) * 30, 0, 1200);
+      const hist = { t: push(s.hist.t, t), h: push(s.hist.h, h), p: push(s.hist.p, p), w: push(s.hist.w, w) };
+      return Object.assign({}, s, { t: t, h: h, p: p, w: w, deg: deg, rain: rain, sol: sol, gust: w * (1.3 + Math.random() * 0.3), hist: hist, seen: now });
+    });
+    this.setState({ sensors: sensors, now: now, times: push(this.state.times, now) });
+  }
+  renderVals() {
+    const st = this.state;
+    const accent = this.props.accent ?? '#7C9CFF';
+    const all = st.sensors;
+    const live = all.filter((s) => !s.offline);
+    const avg = (f) => live.reduce((a, s) => a + f(s), 0) / Math.max(1, live.length);
+    const avgHist = (key) => st.times.map((_, k) => live.reduce((a, s) => a + s.hist[key][k], 0) / Math.max(1, live.length));
+    const windiest = live.reduce((m, s) => (s.w > m.w ? s : m), live[0]);
+    const select = (id) => () => this.setState({ selected: id, hover: -1 });
+
+    // events
+    const events = [];
+    all.forEach((s) => {
+      if (s.offline) events.push({ key: s.id + '-off', sid: s.id, title: 'Sem dados recebidos', detail: s.name + ' · último pacote ' + wxAgo(st.now - s.seen) + ', sinal ' + s.sig + ' dBm', level: 'crit', time: wxTime(new Date(s.seen)).slice(0, 5) });
+      if (!s.offline && s.bat < 25) events.push({ key: s.id + '-bat', sid: s.id, title: 'Bateria baixa (' + Math.round(s.bat) + '%)', detail: s.name + ' · agendar troca da bateria', level: 'warn', time: wxTime(new Date(st.start - 42 * 60000)).slice(0, 5) });
+      if (!s.offline && s.w > 9) events.push({ key: s.id + '-wind', sid: s.id, title: 'Vento acima de 9 m/s', detail: s.name + ' · agora ' + wxN(s.w, 1) + ' m/s ' + wxDir(s.deg), level: 'warn', time: wxTime(new Date(st.start - 6 * 60000)).slice(0, 5) });
+    });
+    events.push({ key: 'i-rain', sid: 'WS-02', title: 'Início de chuva', detail: 'Pluviômetro Margem do Rio · intensidade acima de 1 mm/h', level: 'info', time: wxTime(new Date(st.start - 18 * 60000)).slice(0, 5) });
+    events.push({ key: 'i-fw', sid: 'WS-03', title: 'Firmware atualizado para 2.14', detail: 'Cobertura da Sede · reiniciado, leituras retomadas', level: 'info', time: wxTime(new Date(st.start - 95 * 60000)).slice(0, 5) });
+    const activeAlerts = events.filter((e) => e.level !== 'info' && !st.acked[e.key]);
+    const crit = activeAlerts.filter((e) => e.level === 'crit').length;
+    const warn = activeAlerts.length - crit;
+    const ackedCount = events.filter((e) => st.acked[e.key]).length;
+    const lvl = {
+      crit: { color: '#FF6B81', bg: 'rgba(255,107,129,0.14)', icon: WX_ICON.crit },
+      warn: { color: '#FFB547', bg: 'rgba(255,181,71,0.14)', icon: WX_ICON.warn },
+      info: { color: '#98A3C4', bg: 'rgba(152,163,196,0.12)', icon: WX_ICON.info }
+    };
+    const eventRows = events.map((e) => {
+      const acked = !!st.acked[e.key];
+      return Object.assign({ id: e.sid }, e, lvl[e.level], {
+        opacity: acked ? '0.55' : '1',
+        canAck: e.level !== 'info' && !acked,
+        isAcked: acked,
+        ack: () => { this.setState({ acked: Object.assign({}, st.acked, { [e.key]: true }) }); this.wxNotify('Alerta ' + e.sid + ' reconhecido'); },
+        select: select(e.sid)
+      });
+    });
+
+    // filters
+    const pickBtn = (cur, val, key, label) => ({
+      label: label || val,
+      pressed: cur === val ? 'true' : 'false',
+      bg: cur === val ? '#243052' : 'transparent',
+      fg: cur === val ? '#EEF1FA' : '#98A3C4',
+      pick: () => this.setState({ [key]: val })
+    });
+
+    // table
+    const q = st.query.trim().toLowerCase();
+    const sortVal = {
+      name: (s) => s.name, local: (s) => s.site, t: (s) => (s.offline ? -999 : s.t), h: (s) => (s.offline ? -999 : s.h),
+      p: (s) => (s.offline ? -999 : s.p), w: (s) => (s.offline ? -999 : s.w), rain: (s) => (s.offline ? -999 : s.rain),
+      bat: (s) => s.bat, sig: (s) => s.sig, status: (s) => WX_ST[wxStatus(s)].rank, seen: (s) => s.seen
+    };
+    const sv = sortVal[st.sortKey];
+    const filtered = all
+      .filter((s) => st.kind === 'Todos' || s.kind === st.kind)
+      .filter((s) => st.status === 'Todos' || WX_ST[wxStatus(s)].label === st.status)
+      .filter((s) => !q || (s.name + ' ' + s.site + ' ' + s.place + ' ' + s.model + ' ' + s.id).toLowerCase().indexOf(q) >= 0)
+      .slice()
+      .sort((a, b) => {
+        const va = sv(a), vb = sv(b);
+        const c = typeof va === 'string' ? va.localeCompare(vb, 'pt-BR') : va - vb;
+        return c * st.sortDir;
+      });
+    const kindStyle = (k) => k === 'Solo'
+      ? { bg: 'rgba(61,214,163,0.12)', fg: '#6FE3BC', icon: WX_ICON.ground }
+      : { bg: 'rgba(167,139,250,0.16)', fg: '#C9B8FF', icon: WX_ICON.building };
+    const rows = filtered.map((s) => {
+      const code = wxStatus(s);
+      const sel = s.id === st.selected;
+      const dash = s.offline;
+      const ks = kindStyle(s.kind);
+      const level = s.sig >= -65 ? 4 : s.sig >= -72 ? 3 : s.sig >= -80 ? 2 : s.sig >= -90 ? 1 : 0;
+      const barC = level >= 3 ? '#3DD6A3' : level === 2 ? '#FFB547' : '#FF6B81';
+      return {
+        id: s.id, name: s.name, model: s.model, site: s.site, place: s.place,
+        kindBg: ks.bg, kindFg: ks.fg, kindIcon: ks.icon,
+        t: dash ? '—' : wxN(s.t, 1), tColor: dash ? WX_C.dim : wxTempColor(s.t),
+        h: dash ? '—' : Math.round(s.h),
+        p: dash ? '—' : wxN(s.p, 1),
+        w: dash ? '—' : wxN(s.w, 1),
+        wd: dash ? '' : wxDir(s.deg),
+        windDeg: Math.round(s.deg + 180),
+        windColor: !dash && s.w > 9 ? '#FFB547' : '#EEF1FA',
+        rain: dash ? '—' : wxN(s.rain, 1),
+        rainColor: !dash && s.rain > 0 ? '#5CC8E0' : '#EEF1FA',
+        bat: Math.round(s.bat) + '%',
+        batW: Math.round(s.bat) + '%',
+        batColor: s.bat < 25 ? '#FF6B81' : s.bat < 50 ? '#FFB547' : '#3DD6A3',
+        batText: s.bat < 25 ? '#FF6B81' : '#C7CFE6',
+        bars: [1, 2, 3, 4].map((n) => ({ h: (n * 3 + 2) + 'px', c: n <= level ? barC : '#243052' })),
+        sigLabel: 'Sinal ' + s.sig + ' dBm',
+        stLabel: WX_ST[code].label, stFg: WX_ST[code].fg, stBg: WX_ST[code].bg,
+        ago: wxAgo(st.now - s.seen),
+        rowBg: sel ? 'rgba(124,156,255,0.10)' : 'transparent',
+        rowMark: sel ? 'inset 3px 0 0 ' + accent : 'none',
+        select: select(s.id)
+      };
+    });
+    const H = [
+      { key: 'name', label: 'Sensor', align: 'left', pad: '12px 0 20px' },
+      { key: 'local', label: 'Local', align: 'left' },
+      { key: 't', label: 'Temp °C', align: 'right' },
+      { key: 'h', label: 'Umid %', align: 'right' },
+      { key: 'p', label: 'hPa', align: 'right' },
+      { key: 'w', label: 'Vento m/s', align: 'right' },
+      { key: 'rain', label: 'Chuva mm/h', align: 'right' },
+      { key: 'bat', label: 'Bateria', align: 'left' },
+      { key: 'sig', label: 'Sinal', align: 'left' },
+      { key: 'status', label: 'Status', align: 'left' },
+      { key: 'seen', label: 'Atualizado', align: 'right', pad: '20px 0 12px' }
+    ];
+    const headers = H.map((h) => {
+      const on = st.sortKey === h.key;
+      return {
+        label: h.label, align: h.align, sortable: true, plain: false,
+        pad: h.key === 'name' ? '12px 0 20px' : h.key === 'seen' ? '12px 0 12px' : '12px',
+        justify: h.align === 'right' ? 'flex-end' : 'flex-start',
+        color: on ? '#EEF1FA' : '#98A3C4',
+        arrow: on ? (st.sortDir > 0 ? '↑' : '↓') : '',
+        ariaSort: on ? (st.sortDir > 0 ? 'ascending' : 'descending') : 'none',
+        click: () => this.setState({ sortKey: h.key, sortDir: on ? -st.sortDir : (h.key === 'name' || h.key === 'local' ? 1 : -1) })
+      };
+    });
+    headers[0].pad = '0 12px 0 20px';
+    headers[10].pad = '0 20px 0 12px';
+    headers.forEach((h, i) => { if (i !== 0 && i !== 10) h.pad = '0 12px'; });
+
+    // map
+    const lats = all.map((s) => s.lat), lons = all.map((s) => s.lon);
+    const minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    const minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
+    const mapDots = all.map((s) => {
+      const code = wxStatus(s);
+      const sel = s.id === st.selected;
+      const c = WX_ST[code].fg;
+      const alertActive = activeAlerts.some((e) => e.sid === s.id);
+      return {
+        x: (8 + 76 * (s.lon - minLon) / (maxLon - minLon)).toFixed(2) + '%',
+        y: (14 + 72 * (maxLat - s.lat) / (maxLat - minLat)).toFixed(2) + '%',
+        size: sel ? '18px' : '14px',
+        radius: s.kind === 'Solo' ? '50%' : '4px',
+        fill: sel ? c : '#0D1328',
+        ring: c,
+        pulse: alertActive ? (code === 'offline' ? 'wx-crit' : 'wx-warn') : '',
+        label: s.id + (s.offline ? '' : ' · ' + wxN(s.t, 1) + '°'),
+        tagBg: sel ? accent : 'rgba(17,24,51,0.85)',
+        tagFg: sel ? '#0A0F1E' : '#C7CFE6',
+        aria: s.name + ', ' + WX_ST[code].label,
+        select: select(s.id)
+      };
+    });
+
+    // detail
+    const idx = Math.max(0, all.findIndex((x) => x.id === st.selected));
+    const s = all[idx];
+    const code = wxStatus(s);
+    const dash = s.offline;
+    const f = (v, n) => (dash ? '—' : wxN(v, n));
+    const ks = kindStyle(s.kind);
+    const ringOff = (pct) => (188.5 * (1 - wxClamp(pct, 0, 1))).toFixed(1);
+    const d = {
+      id: s.id, name: s.name, kind: s.kind, site: s.site, place: s.place,
+      kindBg: ks.bg, kindFg: ks.fg,
+      stLabel: WX_ST[code].label, stFg: WX_ST[code].fg, stBg: WX_ST[code].bg,
+      t: f(s.t, 1), tColor: dash ? WX_C.dim : wxTempColor(s.t),
+      feels: dash ? '—' : wxN(wxFeels(s.t, s.h), 1),
+      dew: dash ? '—' : wxN(wxDew(s.t, s.h), 1),
+      rings: [
+        { label: 'Umidade', value: dash ? '—' : Math.round(s.h) + '%', offset: ringOff(dash ? 0 : s.h / 100), color: '#5CC8E0' },
+        { label: 'Bateria', value: Math.round(s.bat) + '%', offset: ringOff(s.bat / 100), color: s.bat < 25 ? '#FF6B81' : s.bat < 50 ? '#FFB547' : '#3DD6A3' }
+      ],
+      metrics: [
+        { label: 'Pressão', value: f(s.p, 1), unit: 'hPa' },
+        { label: 'Chuva', value: f(s.rain, 1), unit: 'mm/h' },
+        { label: 'Índice UV', value: dash ? '—' : String(s.uv), unit: s.uv >= 8 ? 'muito alto' : 'alto' },
+        { label: 'Rad. solar', value: f(s.sol, 0), unit: 'W/m²' }
+      ],
+      points: WX_HIST,
+      wind: f(s.w, 1), gust: f(s.gust, 1), wd: dash ? '—' : wxDir(s.deg),
+      windFrom: dash ? '—' : Math.round(((s.deg % 360) + 360) % 360),
+      windDeg: Math.round(s.deg + 180),
+      beaufort: dash ? '—' : wxBeaufort(s.w),
+      info: [
+        { k: 'Modelo', v: s.model },
+        { k: 'Nº de série', v: s.serial },
+        { k: 'Firmware', v: s.fw },
+        { k: 'Instalação', v: s.installed },
+        { k: 'Coordenadas', v: wxN(s.lat, 4) + ' / ' + wxN(s.lon, 4) },
+        { k: 'Alimentação', v: s.power },
+        { k: 'Sinal', v: s.sig + ' dBm' },
+        { k: 'Última leitura', v: wxTime(new Date(s.seen)) + ' (' + wxAgo(st.now - s.seen) + ')' },
+        { k: 'Montagem', v: s.kind === 'Solo' ? 'Mastro no solo' : 'Fixado em edificação' },
+        { k: 'Local', v: s.site }
+      ]
+    };
+
+    // chart
+    const M = WX_METRICS[st.metric];
+    const vals = s.hist[st.metric];
+    const vlo = Math.min.apply(null, vals), vhi = Math.max.apply(null, vals);
+    const pad = Math.max((vhi - vlo) * 0.15, M.dec ? 0.2 : 1);
+    const lo = vlo - pad, hi = vhi + pad;
+    const yOf = (v) => 6 + (1 - (v - lo) / (hi - lo)) * 128;
+    const pts = vals.map((v, k) => (k * 400 / (vals.length - 1)).toFixed(1) + ',' + yOf(v).toFixed(1));
+    const hv = st.hover >= 0 && st.hover < vals.length ? st.hover : -1;
+    const hxPct = hv >= 0 ? hv * 100 / (vals.length - 1) : 0;
+    const chart = {
+      color: M.color,
+      line: pts.join(' '),
+      area: '0,140 ' + pts.join(' ') + ' 400,140',
+      hi: wxN(hi, M.dec), mid: wxN((hi + lo) / 2, M.dec), lo: wxN(lo, M.dec),
+      t0: wxTime(new Date(st.times[0])).slice(0, 8), t1: wxTime(new Date(st.times[st.times.length - 1])).slice(0, 8),
+      aria: 'Gráfico de ' + M.name + ' do sensor ' + s.id,
+      hasHover: hv >= 0 && !dash,
+      hx: hxPct.toFixed(2) + '%',
+      hy: hv >= 0 ? (yOf(vals[hv]) / 140 * 100).toFixed(2) + '%' : '0%',
+      tipX: hxPct.toFixed(2) + '%',
+      tipShift: hxPct > 80 ? 'calc(-100% - 10px)' : hxPct < 20 ? '10px' : '-50%',
+      hv: hv >= 0 ? wxN(vals[hv], M.dec) + ' ' + M.unit : '',
+      ht: hv >= 0 ? wxTime(new Date(st.times[hv])) : ''
+    };
+    const chartTabs = Object.keys(WX_METRICS).map((k) => ({
+      label: WX_METRICS[k].label,
+      pressed: st.metric === k ? 'true' : 'false',
+      bg: st.metric === k ? '#243052' : 'transparent',
+      fg: st.metric === k ? '#EEF1FA' : '#98A3C4',
+      pick: () => this.setState({ metric: k, hover: -1 })
+    }));
+
+    // KPI trends
+    const tH = avgHist('t'), hH = avgHist('h'), wH = st.times.map((_, k) => Math.max.apply(null, live.map((x) => x.hist.w[k])));
+    const deltaChip = (cur, past, dec, unit, upIsBad) => {
+      const dl = cur - past;
+      const up = dl >= 0;
+      const bad = upIsBad ? up : !up;
+      const small = Math.abs(dl) < Math.pow(10, -dec) / 2;
+      return {
+        delta: (up ? '+' : '−') + wxN(Math.abs(dl), dec) + (unit ? ' ' + unit : ''),
+        deltaBg: small ? 'rgba(152,163,196,0.12)' : bad ? 'rgba(255,181,71,0.14)' : 'rgba(61,214,163,0.14)',
+        deltaFg: small ? '#98A3C4' : bad ? '#FFC56E' : '#6FE3BC'
+      };
+    };
+    const mk = (label, arr, dec, unit, sub, color, upIsBad) => {
+      const sp = wxSpark(arr, 120, 40, 4);
+      const cur = arr[arr.length - 1];
+      return Object.assign({ label: label, value: wxN(cur, dec), unit: unit, sub: sub, color: color, line: sp.line, area: sp.area }, deltaChip(cur, arr[0], dec, '', upIsBad));
+    };
+    const kpiTrends = [
+      mk('Temperatura média', tH, 1, '°C', 'Faixa ' + wxN(Math.min.apply(null, live.map((x) => x.t)), 1) + ' – ' + wxN(Math.max.apply(null, live.map((x) => x.t)), 1) + ' °C', '#FF9F6B', true),
+      mk('Umidade média', hH, 0, '%', 'Pressão média ' + wxN(avg((x) => x.p), 1) + ' hPa', '#5CC8E0', false),
+      mk('Vento máximo', wH, 1, 'm/s', 'em ' + windiest.name, '#3DD6A3', true)
+    ];
+
+    // navigation
+    const go = (dir) => () => this.setState({ selected: all[(idx + dir + all.length) % all.length].id, hover: -1 });
+
+    return {
+      accent: accent,
+      clock: wxTime(new Date(st.now)),
+      liveLabel: st.paused ? 'Pausado' : 'Ao vivo',
+      liveDot: st.paused ? '#98A3C4' : '#3DD6A3',
+      liveClass: st.paused ? '' : 'wx-live',
+      pauseLabel: st.paused ? 'Retomar' : 'Pausar',
+      pauseIcon: st.paused ? 'M7 4l12 8-12 8z' : 'M8 5v14M16 5v14',
+      togglePause: () => this.setState({ paused: !st.paused }),
+      intervals: [1, 2, 5].map((n) => ({
+        label: n + 's', pressed: st.interval === n ? 'true' : 'false',
+        bg: st.interval === n ? '#243052' : 'transparent', fg: st.interval === n ? '#EEF1FA' : '#98A3C4',
+        pick: () => this.setState({ interval: n }, () => this.wxSchedule())
+      })),
+      exportCsv: () => this.wxNotify('CSV gerado com ' + filtered.length + ' sensores'),
+      addSensor: () => this.wxNotify('Assistente de cadastro de sensor aberto'),
+      kpi: {
+        online: live.length, total: all.length,
+        onlinePct: Math.round(live.length / all.length * 100) + '%',
+        onlineOffset: (188.5 * (1 - live.length / all.length)).toFixed(1),
+        offlineText: (all.length - live.length) + ' offline · ' + all.filter((x) => wxStatus(x) === 'warning').length + ' com atenção',
+        alerts: crit + warn, critical: crit, warn: warn,
+        alertColor: crit ? '#FF6B81' : warn ? '#FFB547' : '#3DD6A3',
+        ackText: ackedCount ? ackedCount + ' reconhecido(s) nesta sessão' : 'Nenhum alerta reconhecido ainda'
+      },
+      kpiTrends: kpiTrends,
+      query: st.query,
+      setQuery: (e) => this.setState({ query: e.target.value }),
+      kindFilters: ['Todos', 'Solo', 'Edifício'].map((v) => pickBtn(st.kind, v, 'kind')),
+      statusFilters: ['Todos', 'Online', 'Atenção', 'Offline'].map((v) => pickBtn(st.status, v, 'status')),
+      headers: headers,
+      rows: rows,
+      noRows: rows.length === 0,
+      rowCount: rows.length,
+      totalCount: all.length,
+      mapDots: mapDots,
+      events: eventRows,
+      ackAll: () => {
+        const a = Object.assign({}, st.acked);
+        events.forEach((e) => { if (e.level !== 'info') a[e.key] = true; });
+        this.setState({ acked: a });
+        this.wxNotify('Todos os alertas foram reconhecidos');
+      },
+      d: d,
+      prevSensor: go(-1),
+      nextSensor: go(1),
+      tabs: [{ k: 'readings', label: 'Leituras' }, { k: 'device', label: 'Dispositivo' }].map((t) => ({
+        label: t.label, selected: st.tab === t.k ? 'true' : 'false',
+        line: st.tab === t.k ? accent : 'transparent', fg: st.tab === t.k ? '#EEF1FA' : '#98A3C4',
+        pick: () => this.setState({ tab: t.k })
+      })),
+      showReadings: st.tab === 'readings',
+      showDevice: st.tab === 'device',
+      chart: chart,
+      chartTabs: chartTabs,
+      chartMove: (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        if (!r.width) return;
+        const x = wxClamp((e.clientX - r.left) / r.width, 0, 1);
+        const i = Math.round(x * (WX_HIST - 1));
+        if (i !== st.hover) this.setState({ hover: i });
+      },
+      chartLeave: () => this.setState({ hover: -1 }),
+      actions: [
+        { label: 'Reiniciar', icon: 'M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5', run: () => this.wxNotify('Comando de reinício enviado para ' + s.id) },
+        { label: 'Calibrar', icon: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4', run: () => this.wxNotify('Calibração agendada para ' + s.id) },
+        { label: 'Ler agora', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z', run: () => { this.wxTick(); this.wxNotify('Leitura solicitada a ' + s.id); } }
+      ],
+      hasToast: !!st.toast,
+      toast: st.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
