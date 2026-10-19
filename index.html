@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WeatherTime · Projex Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0F11}
+a{color:#F2928A}a:hover{color:#DE8A85}
+button{font:inherit}
+@keyframes cpulse{0%{box-shadow:0 0 0 0 rgba(139,43,41,.5)}70%{box-shadow:0 0 0 8px rgba(139,43,41,0)}100%{box-shadow:0 0 0 0 rgba(139,43,41,0)}}
+@keyframes cring{0%{transform:translate(-50%,-50%) scale(.6);opacity:.8}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
+@keyframes chalo{0%,100%{opacity:.85}50%{opacity:.6}}
+@keyframes ctoast{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes cpop{from{opacity:0}to{opacity:1}}
+.c-live{animation:cpulse 2s infinite}
+.c-ring{animation:cring 2s ease-out infinite}
+.c-halo{animation:chalo 4s ease-in-out infinite}
+.c-toast{animation:ctoast .25s ease-out}
+.c-pop{animation:cpop .25s ease-out}
+.c-item{transition:background .15s,border-color .15s}
+.c-item:hover{background:#25272B}
+.c-ghost{transition:background .15s}
+.c-ghost:hover{background:#2B2D32}
+.c-kpi{transition:border-color .15s,background .15s}
+.c-kpi:hover{border-color:#5A5F67}
+.c-mk{transition:left .4s,top .4s}
+.c-mk:hover .c-pin{filter:brightness(1.08)}
+.c-glass{background:rgba(14,15,17,0.76);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+button:focus-visible{outline:2px solid #F2928A;outline-offset:2px}
+</style>
+<style>
+html,body{height:100%;margin:0;overflow:hidden;background:#0E0F11}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n(e.htmPreact={})}(this,function(e){var n,_,t,o,r,u,l,i={},c=[],f=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;function s(e,n){for(var _ in n)e[_]=n[_];return e}function a(e){var n=e.parentNode;n&&n.removeChild(e)}function p(e,_,t){var o,r,u,l={};for(u in _)"key"==u?o=_[u]:"ref"==u?r=_[u]:l[u]=_[u];if(arguments.length>2&&(l.children=arguments.length>3?n.call(arguments,2):t),"function"==typeof e&&null!=e.defaultProps)for(u in e.defaultProps)void 0===l[u]&&(l[u]=e.defaultProps[u]);return h(e,l,o,r,null)}function h(e,n,o,r,u){var l={type:e,props:n,key:o,ref:r,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:null==u?++t:u};return null!=_.vnode&&_.vnode(l),l}function d(e){return e.children}function v(e,n){this.props=e,this.context=n}function y(e,n){if(null==n)return e.__?y(e.__,e.__.__k.indexOf(e)+1):null;for(var _;n<e.__k.length;n++)if(null!=(_=e.__k[n])&&null!=_.__e)return _.__e;return"function"==typeof e.type?y(e):null}function m(e){var n,_;if(null!=(e=e.__)&&null!=e.__c){for(e.__e=e.__c.base=null,n=0;n<e.__k.length;n++)if(null!=(_=e.__k[n])&&null!=_.__e){e.__e=e.__c.base=_.__e;break}return m(e)}}function g(e){(!e.__d&&(e.__d=!0)&&o.push(e)&&!k.__r++||u!==_.debounceRendering)&&((u=_.debounceRendering)||r)(k)}function k(){for(var e;k.__r=o.length;)e=o.sort(function(e,n){return e.__v.__b-n.__v.__b}),o=[],e.some(function(e){var n,_,t,o,r,u;e.__d&&(r=(o=(n=e).__v).__e,(u=n.__P)&&(_=[],(t=s({},o)).__v=o.__v+1,D(u,o,t,n.__n,void 0!==u.ownerSVGElement,null!=o.__h?[r]:null,_,null==r?y(o):r,o.__h),w(_,o),o.__e!=r&&m(o)))})}function b(e,n,_,t,o,r,u,l,f,s){var a,p,v,m,g,k,b,H=t&&t.__k||c,E=H.length;for(_.__k=[],a=0;a<n.length;a++)if(null!=(m=_.__k[a]=null==(m=n[a])||"boolean"==typeof m?null:"string"==typeof m||"number"==typeof m||"bigint"==typeof m?h(null,m,null,null,m):Array.isArray(m)?h(d,{children:m},null,null,null):m.__b>0?h(m.type,m.props,m.key,null,m.__v):m)){if(m.__=_,m.__b=_.__b+1,null===(v=H[a])||v&&m.key==v.key&&m.type===v.type)H[a]=void 0;else for(p=0;p<E;p++){if((v=H[p])&&m.key==v.key&&m.type===v.type){H[p]=void 0;break}v=null}D(e,m,v=v||i,o,r,u,l,f,s),g=m.__e,(p=m.ref)&&v.ref!=p&&(b||(b=[]),v.ref&&b.push(v.ref,null,m),b.push(p,m.__c||g,m)),null!=g?(null==k&&(k=g),"function"==typeof m.type&&null!=m.__k&&m.__k===v.__k?m.__d=f=C(m,f,e):f=x(e,m,v,H,g,f),s||"option"!==_.type?"function"==typeof _.type&&(_.__d=f):e.value=""):f&&v.__e==f&&f.parentNode!=e&&(f=y(v))}for(_.__e=k,a=E;a--;)null!=H[a]&&("function"==typeof _.type&&null!=H[a].__e&&H[a].__e==_.__d&&(_.__d=y(t,a+1)),A(H[a],H[a]));if(b)for(a=0;a<b.length;a++)U(b[a],b[++a],b[++a])}function C(e,n,_){var t,o;for(t=0;t<e.__k.length;t++)(o=e.__k[t])&&(o.__=e,n="function"==typeof o.type?C(o,n,_):x(_,o,o,e.__k,o.__e,n));return n}function x(e,n,_,t,o,r){var u,l,i;if(void 0!==n.__d)u=n.__d,n.__d=void 0;else if(null==_||o!=r||null==o.parentNode)e:if(null==r||r.parentNode!==e)e.appendChild(o),u=null;else{for(l=r,i=0;(l=l.nextSibling)&&i<t.length;i+=2)if(l==o)break e;e.insertBefore(o,r),u=r}return void 0!==u?u:o.nextSibling}function H(e,n,_){"-"===n[0]?e.setProperty(n,_):e[n]=null==_?"":"number"!=typeof _||f.test(n)?_:_+"px"}function E(e,n,_,t,o){var r;e:if("style"===n)if("string"==typeof _)e.style.cssText=_;else{if("string"==typeof t&&(e.style.cssText=t=""),t)for(n in t)_&&n in _||H(e.style,n,"");if(_)for(n in _)t&&_[n]===t[n]||H(e.style,n,_[n])}else if("o"===n[0]&&"n"===n[1])r=n!==(n=n.replace(/Capture$/,"")),n=n.toLowerCase()in e?n.toLowerCase().slice(2):n.slice(2),e.l||(e.l={}),e.l[n+r]=_,_?t||e.addEventListener(n,r?S:P,r):e.removeEventListener(n,r?S:P,r);else if("dangerouslySetInnerHTML"!==n){if(o)n=n.replace(/xlink[H:h]/,"h").replace(/sName$/,"s");else if("href"!==n&&"list"!==n&&"form"!==n&&"tabIndex"!==n&&"download"!==n&&n in e)try{e[n]=null==_?"":_;break e}catch(e){}"function"==typeof _||(null!=_&&(!1!==_||"a"===n[0]&&"r"===n[1])?e.setAttribute(n,_):e.removeAttribute(n))}}function P(e){this.l[e.type+!1](_.event?_.event(e):e)}function S(e){this.l[e.type+!0](_.event?_.event(e):e)}function D(e,n,t,o,r,u,l,i,c){var f,a,p,h,y,m,g,k,C,x,H,E=n.type;if(void 0!==n.constructor)return null;null!=t.__h&&(c=t.__h,i=n.__e=t.__e,n.__h=null,u=[i]),(f=_.__b)&&f(n);try{e:if("function"==typeof E){if(k=n.props,C=(f=E.contextType)&&o[f.__c],x=f?C?C.props.value:f.__:o,t.__c?g=(a=n.__c=t.__c).__=a.__E:("prototype"in E&&E.prototype.render?n.__c=a=new E(k,x):(n.__c=a=new v(k,x),a.constructor=E,a.render=M),C&&C.sub(a),a.props=k,a.state||(a.state={}),a.context=x,a.__n=o,p=a.__d=!0,a.__h=[]),null==a.__s&&(a.__s=a.state),null!=E.getDerivedStateFromProps&&(a.__s==a.state&&(a.__s=s({},a.__s)),s(a.__s,E.getDerivedStateFromProps(k,a.__s))),h=a.props,y=a.state,p)null==E.getDerivedStateFromProps&&null!=a.componentWillMount&&a.componentWillMount(),null!=a.componentDidMount&&a.__h.push(a.componentDidMount);else{if(null==E.getDerivedStateFromProps&&k!==h&&null!=a.componentWillReceiveProps&&a.componentWillReceiveProps(k,x),!a.__e&&null!=a.shouldComponentUpdate&&!1===a.shouldComponentUpdate(k,a.__s,x)||n.__v===t.__v){a.props=k,a.state=a.__s,n.__v!==t.__v&&(a.__d=!1),a.__v=n,n.__e=t.__e,n.__k=t.__k,n.__k.forEach(function(e){e&&(e.__=n)}),a.__h.length&&l.push(a);break e}null!=a.componentWillUpdate&&a.componentWillUpdate(k,a.__s,x),null!=a.componentDidUpdate&&a.__h.push(function(){a.componentDidUpdate(h,y,m)})}a.context=x,a.props=k,a.state=a.__s,(f=_.__r)&&f(n),a.__d=!1,a.__v=n,a.__P=e,f=a.render(a.props,a.state,a.context),a.state=a.__s,null!=a.getChildContext&&(o=s(s({},o),a.getChildContext())),p||null==a.getSnapshotBeforeUpdate||(m=a.getSnapshotBeforeUpdate(h,y)),H=null!=f&&f.type===d&&null==f.key?f.props.children:f,b(e,Array.isArray(H)?H:[H],n,t,o,r,u,l,i,c),a.base=n.__e,n.__h=null,a.__h.length&&l.push(a),g&&(a.__E=a.__=null),a.__e=!1}else null==u&&n.__v===t.__v?(n.__k=t.__k,n.__e=t.__e):n.__e=T(t.__e,n,t,o,r,u,l,c);(f=_.diffed)&&f(n)}catch(e){n.__v=null,(c||null!=u)&&(n.__e=i,n.__h=!!c,u[u.indexOf(i)]=null),_.__e(e,n,t)}}function w(e,n){_.__c&&_.__c(n,e),e.some(function(n){try{e=n.__h,n.__h=[],e.some(function(e){e.call(n)})}catch(e){_.__e(e,n.__v)}})}function T(e,_,t,o,r,u,l,c){var f,s,p,h=t.props,d=_.props,v=_.type,m=0;if("svg"===v&&(r=!0),null!=u)for(;m<u.length;m++)if((f=u[m])&&(f===e||(v?f.localName==v:3==f.nodeType))){e=f,u[m]=null;break}if(null==e){if(null===v)return document.createTextNode(d);e=r?document.createElementNS("http://www.w3.org/2000/svg",v):document.createElement(v,d.is&&d),u=null,c=!1}if(null===v)h===d||c&&e.data===d||(e.data=d);else{if(u=u&&n.call(e.childNodes),s=(h=t.props||i).dangerouslySetInnerHTML,p=d.dangerouslySetInnerHTML,!c){if(null!=u)for(h={},m=0;m<e.attributes.length;m++)h[e.attributes[m].name]=e.attributes[m].value;(p||s)&&(p&&(s&&p.__html==s.__html||p.__html===e.innerHTML)||(e.innerHTML=p&&p.__html||""))}if(function(e,n,_,t,o){var r;for(r in _)"children"===r||"key"===r||r in n||E(e,r,null,_[r],t);for(r in n)o&&"function"!=typeof n[r]||"children"===r||"key"===r||"value"===r||"checked"===r||_[r]===n[r]||E(e,r,n[r],_[r],t)}(e,d,h,r,c),p)_.__k=[];else if(m=_.props.children,b(e,Array.isArray(m)?m:[m],_,t,o,r&&"foreignObject"!==v,u,l,u?u[0]:t.__k&&y(t,0),c),null!=u)for(m=u.length;m--;)null!=u[m]&&a(u[m]);c||("value"in d&&void 0!==(m=d.value)&&(m!==e.value||"progress"===v&&!m)&&E(e,"value",m,h.value,!1),"checked"in d&&void 0!==(m=d.checked)&&m!==e.checked&&E(e,"checked",m,h.checked,!1))}return e}function U(e,n,t){try{"function"==typeof e?e(n):e.current=n}catch(e){_.__e(e,t)}}function A(e,n,t){var o,r;if(_.unmount&&_.unmount(e),(o=e.ref)&&(o.current&&o.current!==e.__e||U(o,null,n)),null!=(o=e.__c)){if(o.componentWillUnmount)try{o.componentWillUnmount()}catch(e){_.__e(e,n)}o.base=o.__P=null}if(o=e.__k)for(r=0;r<o.length;r++)o[r]&&A(o[r],n,"function"!=typeof e.type);t||null==e.__e||a(e.__e),e.__e=e.__d=void 0}function M(e,n,_){return this.constructor(e,_)}n=c.slice,_={__e:function(e,n){for(var _,t,o;n=n.__;)if((_=n.__c)&&!_.__)try{if((t=_.constructor)&&null!=t.getDerivedStateFromError&&(_.setState(t.getDerivedStateFromError(e)),o=_.__d),null!=_.componentDidCatch&&(_.componentDidCatch(e),o=_.__d),o)return _.__E=_}catch(n){e=n}throw e}},t=0,v.prototype.setState=function(e,n){var _;_=null!=this.__s&&this.__s!==this.state?this.__s:this.__s=s({},this.state),"function"==typeof e&&(e=e(s({},_),this.props)),e&&s(_,e),null!=e&&this.__v&&(n&&this.__h.push(n),g(this))},v.prototype.forceUpdate=function(e){this.__v&&(this.__e=!0,e&&this.__h.push(e),g(this))},v.prototype.render=d,o=[],r="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,k.__r=0,l=0;var F,L,N,W=0,R=[],I=_.__b,O=_.__r,V=_.diffed,q=_.__c,B=_.unmount;function $(e,n){_.__h&&_.__h(L,e,W||n),W=0;var t=L.__H||(L.__H={__:[],__h:[]});return e>=t.__.length&&t.__.push({}),t.__[e]}function j(e){return W=1,G(ee,e)}function G(e,n,_){var t=$(F++,2);return t.t=e,t.__c||(t.__=[_?_(n):ee(void 0,n),function(e){var n=t.t(t.__[0],e);t.__[0]!==n&&(t.__=[n,t.__[1]],t.__c.setState({}))}],t.__c=L),t.__}function z(e,n){var t=$(F++,4);!_.__s&&Z(t.__H,n)&&(t.__=e,t.__H=n,L.__h.push(t))}function J(e,n){var _=$(F++,7);return Z(_.__H,n)&&(_.__=e(),_.__H=n,_.__h=e),_.__}function K(){R.forEach(function(e){if(e.__P)try{e.__H.__h.forEach(X),e.__H.__h.forEach(Y),e.__H.__h=[]}catch(n){e.__H.__h=[],_.__e(n,e.__v)}}),R=[]}_.__b=function(e){L=null,I&&I(e)},_.__r=function(e){O&&O(e),F=0;var n=(L=e.__c).__H;n&&(n.__h.forEach(X),n.__h.forEach(Y),n.__h=[])},_.diffed=function(e){V&&V(e);var n=e.__c;n&&n.__H&&n.__H.__h.length&&(1!==R.push(n)&&N===_.requestAnimationFrame||((N=_.requestAnimationFrame)||function(e){var n,_=function(){clearTimeout(t),Q&&cancelAnimationFrame(n),setTimeout(e)},t=setTimeout(_,100);Q&&(n=requestAnimationFrame(_))})(K)),L=void 0},_.__c=function(e,n){n.some(function(e){try{e.__h.forEach(X),e.__h=e.__h.filter(function(e){return!e.__||Y(e)})}catch(t){n.some(function(e){e.__h&&(e.__h=[])}),n=[],_.__e(t,e.__v)}}),q&&q(e,n)},_.unmount=function(e){B&&B(e);var n=e.__c;if(n&&n.__H)try{n.__H.__.forEach(X)}catch(e){_.__e(e,n.__v)}};var Q="function"==typeof requestAnimationFrame;function X(e){var n=L;"function"==typeof e.__c&&e.__c(),L=n}function Y(e){var n=L;e.__c=e.__(),L=n}function Z(e,n){return!e||e.length!==n.length||n.some(function(n,_){return n!==e[_]})}function ee(e,n){return"function"==typeof n?n(e):n}var ne=function(e,n,_,t){var o;n[0]=0;for(var r=1;r<n.length;r++){var u=n[r++],l=n[r]?(n[0]|=u?1:2,_[n[r++]]):n[++r];3===u?t[0]=l:4===u?t[1]=Object.assign(t[1]||{},l):5===u?(t[1]=t[1]||{})[n[++r]]=l:6===u?t[1][n[++r]]+=l+"":u?(o=e.apply(l,ne(e,l,_,["",null])),t.push(o),l[0]?n[0]|=2:(n[r-2]=0,n[r]=o)):t.push(l)}return t},_e=new Map,te=function(e){var n=_e.get(this);return n||(n=new Map,_e.set(this,n)),(n=ne(this,n.get(e)||(n.set(e,n=function(e){for(var n,_,t=1,o="",r="",u=[0],l=function(e){1===t&&(e||(o=o.replace(/^\s*\n\s*|\s*\n\s*$/g,"")))?u.push(0,e,o):3===t&&(e||o)?(u.push(3,e,o),t=2):2===t&&"..."===o&&e?u.push(4,e,0):2===t&&o&&!e?u.push(5,0,!0,o):t>=5&&((o||!e&&5===t)&&(u.push(t,0,o,_),t=6),e&&(u.push(t,e,0,_),t=6)),o=""},i=0;i<e.length;i++){i&&(1===t&&l(),l(i));for(var c=0;c<e[i].length;c++)n=e[i][c],1===t?"<"===n?(l(),u=[u],t=3):o+=n:4===t?"--"===o&&">"===n?(t=1,o=""):o=n+o[0]:r?n===r?r="":o+=n:'"'===n||"'"===n?r=n:">"===n?(l(),t=1):t&&("="===n?(t=5,_=o,o=""):"/"===n&&(t<5||">"===e[i][c+1])?(l(),3===t&&(u=u[0]),t=u,(u=u[0]).push(2,0,t),t=0):" "===n||"\t"===n||"\n"===n||"\r"===n?(l(),t=2):o+=n),3===t&&"!--"===o&&(t=4,u=u[0])}return l(),u}(e)),n),arguments,[])).length>1?n:n[0]}.bind(p);e.h=p,e.html=te,e.render=function(e,t,o){var r,u,l;_.__&&_.__(e,t),u=(r="function"==typeof o)?null:o&&o.__k||t.__k,l=[],D(t,e=(!r&&o||t).__k=p(d,null,[e]),u||i,i,void 0!==t.ownerSVGElement,!r&&o?[o]:u?null:t.firstChild?n.call(t.childNodes):null,l,!r&&o?o:u?u.__e:t.firstChild,r),w(l,e)},e.Component=v,e.createContext=function(e,n){var _={__c:n="__cC"+l++,__:e,Consumer:function(e,n){return e.children(n)},Provider:function(e){var _,t;return this.getChildContext||(_=[],(t={})[n]=this,this.getChildContext=function(){return t},this.shouldComponentUpdate=function(e){this.props.value!==e.value&&_.some(g)},this.sub=function(e){_.push(e);var n=e.componentWillUnmount;e.componentWillUnmount=function(){_.splice(_.indexOf(e),1),n&&n.call(e)}}),e.children}};return _.Provider.__=_.Consumer.contextType=_},e.useState=j,e.useReducer=G,e.useEffect=function(e,n){var t=$(F++,3);!_.__s&&Z(t.__H,n)&&(t.__=e,t.__H=n,L.__H.__h.push(t))},e.useLayoutEffect=z,e.useRef=function(e){return W=5,J(function(){return{current:e}},[])},e.useImperativeHandle=function(e,n,_){W=6,z(function(){"function"==typeof e?e(n()):e&&(e.current=n())},null==_?_:_.concat(e))},e.useMemo=J,e.useCallback=function(e,n){return W=8,J(function(){return e},n)},e.useContext=function(e){var n=L.context[e.__c],_=$(F++,9);return _.c=e,n?(null==_.__&&(_.__=!0,n.sub(L)),n.props.value):e.__},e.useDebugValue=function(e,n){_.useDebugValue&&_.useDebugValue(n?n(e):e)},e.useErrorBoundary=function(e){var n=$(F++,10),_=j();return n.__=e,L.componentDidCatch||(L.componentDidCatch=function(e){n.__&&n.__(e),_[1](e)}),[_[0],function(){_[1](void 0)}]}});
+
+</script>
+<script>
+(function () {
+var html = htmPreact.html, render = htmPreact.render, Component = htmPreact.Component;
+
+function tpl(V) {
+return html`<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; box-sizing: border-box; background: #0E0F11; color: #F2F3F5; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 14px; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+
+<header style="flex: none; height: 56px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="position: relative; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(90deg, #4D2A2B, #8B2B29); color: #F2F3F5; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(139,43,41,0.25)">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13.5V5a2 2 0 1 1 4 0v8.5a3.5 3.5 0 1 1-4 0z"></path><path d="M15 6h3.5a2 2 0 1 0-2-2"></path><path d="M15 10h5.5a2 2 0 1 1-2 2"></path><path d="M15 14h3"></path></svg>
+</div>
+<div>
+<div style="display: flex; align-items: baseline; gap: 10px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.025em">Weather<span style="color: #F2928A">Time</span></h1>
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: #A4A9B1; padding: 3px 10px; border-radius: 999px; border: 1px solid #33363C; background: #18191C">by Projex Consulting</span>
+</div>
+<div style="color: #A4A9B1; font-size: 13px">${V.today}</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div role="group" aria-label="Intervalo de atualização" style="display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: #18191C; border: 1px solid #33363C">
+<span style="color: #A4A9B1; font-size: 12px; padding: 0 8px 0 10px">Atualizar</span>
+${(V.intervals).map((iv, $index) => html`
+<button onClick=${iv.pick} aria-pressed=${iv.pressed} style="height: 34px; min-width: 46px; padding: 0 12px; border-radius: 999px; border: none; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 12px; background: ${iv.bg}; color: ${iv.fg}">${iv.label}</button>
+`)}
+</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 44px; box-sizing: border-box; padding: 0 18px; border-radius: 999px; background: #18191C; border: 1px solid #33363C">
+<span class=${V.liveClass} style="width: 9px; height: 9px; border-radius: 50%; background: ${V.liveDot}"></span>
+<span style="font-weight: 600; font-size: 13px">${V.liveLabel}</span>
+<span style="font-family: 'Space Mono', monospace; color: #A4A9B1; font-size: 13px">${V.clock}</span>
+</div>
+<button class="c-ghost" onClick=${V.togglePause} style="height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #33363C; background: #18191C; color: #F2F3F5; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${V.pauseIcon}></path></svg>${V.pauseLabel}
+</button>
+</div>
+</header>
+
+<div style="flex: 1 1 auto; min-height: 0; display: flex; gap: 16px">
+
+<aside aria-label="Lista de estações" style="flex: none; width: 360px; box-sizing: border-box; background: #18191C; border: 1px solid #27292E; border-radius: 24px; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03)">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px">
+<h2 style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em">Estações</h2>
+<span style="color: #A4A9B1; font-size: 12px">por ${V.layerNameLower}</span>
+</div>
+<div role="group" aria-label="Filtro de instalação" style="display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: #121316; border: 1px solid #27292E">
+${(V.kindFilters).map((kf, $index) => html`
+<button onClick=${kf.pick} aria-pressed=${kf.pressed} style="flex: 1; height: 32px; border-radius: 999px; border: none; background: ${kf.bg}; color: ${kf.fg}; cursor: pointer; font-size: 13px; font-weight: 600">${kf.label}</button>
+`)}
+</div>
+<div style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+${(V.list).map((it, $index) => html`
+<button class="c-item" onClick=${it.select} aria-pressed=${it.pressed} style="position: relative; text-align: left; cursor: pointer; border-radius: 16px; border: 1px solid ${it.border}; background: ${it.bg}; color: #F2F3F5; padding: 10px 12px; display: flex; align-items: center; gap: 12px">
+<span style="flex: none; width: 22px; font-family: 'Space Mono', monospace; font-size: 12px; color: #7A8089; text-align: center">${it.rank}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<span style="display: flex; align-items: center; gap: 8px">
+<span style="flex: none; width: 8px; height: 8px; border-radius: ${it.shape}; background: ${it.stColor}"></span>
+<span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${it.name}</span>
+</span>
+<span style="display: block; height: 4px; border-radius: 2px; background: #27292E; overflow: hidden"><span style="display: block; height: 4px; width: ${it.barW}; background: ${it.valColor}; border-radius: 2px; transition: width .5s"></span></span>
+</span>
+<span style="flex: none; text-align: right">
+<span style="display: block; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 17px; color: ${it.valColor}">${it.value}</span>
+<span style="display: block; font-size: 11px; color: #7A8089">${it.id} · ${it.unit}</span>
+</span>
+</button>
+`)}
+</div>
+<div style="border-radius: 16px; background: #121316; border: 1px solid #27292E; padding: 12px 14px">
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #A4A9B1; margin-bottom: 8px"><span>Status da rede</span><span style="font-family: 'Space Mono', monospace">${V.netLabel}</span></div>
+<div style="display: flex; gap: 3px; height: 8px">
+${(V.netBar).map((nb, $index) => html`
+<span style="flex: ${nb.n}; border-radius: 3px; background: ${nb.color}"></span>
+`)}
+</div>
+<div style="display: flex; gap: 14px; margin-top: 8px; font-size: 12px; color: #A4A9B1">
+${(V.netBar).map((nb, $index) => html`
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 7px; height: 7px; border-radius: 50%; background: ${nb.color}"></span>${nb.label} ${nb.n}</span>
+`)}
+</div>
+</div>
+</aside>
+
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<section aria-label="Mapa" style="position: relative; flex: 1 1 auto; min-height: 0; border-radius: 24px; overflow: hidden; border: 1px solid #27292E; background: #131417">
+<div style="position: absolute; inset: 0; transform: scale(${V.zoom}); transform-origin: ${V.zoomOrigin}; transition: transform .45s cubic-bezier(.2,.8,.2,1)">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<rect width="100" height="100" fill="#131417"></rect>
+<path d="M0 0 H34 C 30 14, 22 22, 12 26 S 0 34, 0 40 Z" fill="#16171A"></path>
+<path d="M4 34 C 14 22, 34 20, 40 34 S 34 58, 18 56 S 0 46, 4 34 Z" fill="#1A1B1F"></path>
+<path d="M10 36 C 17 28, 30 27, 34 36 S 30 50, 20 49 S 7 43, 10 36 Z" fill="#1E2024"></path>
+<path d="M15 37 C 20 33, 27 33, 29 37 S 26 45, 21 44 S 13 41, 15 37 Z" fill="#232529"></path>
+<path d="M52 6 C 62 2, 74 8, 72 18 S 60 30, 52 24 S 44 10, 52 6 Z" fill="#1A1B1F"></path>
+<path d="M0 74 C 16 66, 32 84, 50 78 S 70 86, 80 100 H0 Z" fill="#16171A"></path>
+<g fill="none" stroke="#27292E" stroke-width="1" vector-effect="non-scaling-stroke">
+<path d="M2 32 C 12 18, 36 16, 43 33 S 36 62, 17 60 S -3 47, 2 32 Z" vector-effect="non-scaling-stroke"></path>
+<path d="M48 4 C 60 -2, 78 6, 75 19 S 60 34, 50 27 S 40 9, 48 4 Z" vector-effect="non-scaling-stroke"></path>
+<path d="M0 70 C 16 62, 34 80, 52 74 S 72 82, 84 100" vector-effect="non-scaling-stroke"></path>
+<path d="M0 84 C 14 78, 30 92, 46 88" vector-effect="non-scaling-stroke"></path>
+</g>
+<g fill="#1D1F23">
+<rect x="56" y="66" width="4" height="3" rx="0.4"></rect><rect x="61" y="66" width="5" height="3" rx="0.4"></rect><rect x="67" y="66" width="3" height="3" rx="0.4"></rect>
+<rect x="56" y="70.5" width="3" height="4" rx="0.4"></rect><rect x="60" y="70.5" width="6" height="4" rx="0.4"></rect><rect x="67" y="70.5" width="4" height="4" rx="0.4"></rect>
+<rect x="57" y="76" width="5" height="3" rx="0.4"></rect><rect x="63" y="76" width="4" height="3" rx="0.4"></rect><rect x="68" y="76" width="4" height="3" rx="0.4"></rect>
+<rect x="46" y="20" width="5" height="3" rx="0.4"></rect><rect x="52" y="20" width="4" height="3" rx="0.4"></rect><rect x="46" y="24" width="4" height="3" rx="0.4"></rect>
+</g>
+<path d="M85 0 C 79 16, 93 32, 85 50 S 76 78, 90 100 L 100 100 L 100 0 Z" fill="#1B1D22"></path>
+<path d="M85 0 C 79 16, 93 32, 85 50 S 76 78, 90 100" fill="none" stroke="#3A3E45" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+<path d="M92 0 C 88 18, 98 34, 93 52 S 87 78, 96 100" fill="none" stroke="#30333A" stroke-width="1" stroke-dasharray="2 6" vector-effect="non-scaling-stroke"></path>
+<path d="M0 58 C 25 54, 45 66, 70 56 S 82 48, 88 50" fill="none" stroke="#26282D" stroke-width="9" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+<path d="M0 58 C 25 54, 45 66, 70 56 S 82 48, 88 50" fill="none" stroke="#474B52" stroke-width="1" stroke-dasharray="5 6" vector-effect="non-scaling-stroke"></path>
+<path d="M40 0 C 44 30, 36 60, 46 100" fill="none" stroke="#26282D" stroke-width="6" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+<path d="M60 56 C 62 64, 64 72, 63 80" fill="none" stroke="#26282D" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+</svg>
+
+<span style="position: absolute; left: 92%; top: 36%; transform: rotate(-78deg); font-size: 11px; font-weight: 600; letter-spacing: 0.4em; color: #5E636B; white-space: nowrap; pointer-events: none">RIO</span>
+<span style="position: absolute; left: 14%; top: 50%; font-size: 11px; font-weight: 600; letter-spacing: 0.3em; color: #5A5F67; white-space: nowrap; pointer-events: none">ENCOSTA OESTE</span>
+<span style="position: absolute; left: 55%; top: 82%; font-size: 11px; font-weight: 600; letter-spacing: 0.3em; color: #5A5F67; white-space: nowrap; pointer-events: none">ÁREA URBANA</span>
+<span style="position: absolute; left: 50%; top: 4%; font-size: 11px; font-weight: 600; letter-spacing: 0.3em; color: #5A5F67; white-space: nowrap; pointer-events: none">CAMPO NORTE</span>
+
+${(V.halos).map((hl, $index) => html`
+<span class="c-halo" style="position: absolute; left: ${hl.x}; top: ${hl.y}; width: ${hl.size}; height: ${hl.size}; transform: translate(-50%, -50%); border-radius: 50%; background: ${hl.bg}; pointer-events: none; transition: background .6s"></span>
+`)}
+
+${(V.markers).map((mk, $index) => html`
+<button class="c-mk" onClick=${mk.select} aria-label=${mk.aria} style="position: absolute; left: ${mk.x}; top: ${mk.y}; transform: translate(-50%, -100%) scale(${mk.inv}); transform-origin: 50% 100%; border: none; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; z-index: ${mk.z}">
+<span class="c-pin" style="position: relative; display: flex; align-items: center; gap: 6px; height: ${mk.h}; padding: 0 ${mk.padX}; box-sizing: border-box; border-radius: 999px; background: ${mk.fill}; color: ${mk.txt}; font-family: 'Space Mono', monospace; font-weight: 700; font-size: ${mk.font}; border: 2px solid ${mk.ring}; box-shadow: 0 8px 22px rgba(0,0,0,0.5)">
+<span style="width: 8px; height: 8px; border-radius: ${mk.shape}; background: #0E0F11; opacity: 0.55"></span>${mk.value}
+</span>
+<span style="width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 8px solid ${mk.ring}; margin-top: -1px"></span>
+<span style="position: relative; width: 10px; height: 10px; border-radius: 50%; background: ${mk.stColor}; border: 2px solid #0E0F11; margin-top: 2px">
+${mk.alert ? html`
+<span class="c-ring" style="position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; border-radius: 50%; border: 2px solid ${mk.stColor}"></span>
+` : null}
+</span>
+<span style="margin-top: 4px; white-space: nowrap; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: ${mk.idColor}; text-shadow: 0 1px 3px rgba(0,0,0,0.8)">${mk.id}</span>
+</button>
+`)}
+
+<div class="c-pop" style="position: absolute; left: ${V.pop.x}; top: ${V.pop.y}; transform: ${V.pop.transform}; transform-origin: ${V.pop.origin}; width: 260px; box-sizing: border-box; padding: 14px 16px; border-radius: 18px; background: rgba(242,243,245,0.97); color: #0E0F11; box-shadow: 0 18px 40px rgba(0,0,0,0.55); pointer-events: none; z-index: 30">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #5A5F67">${V.pop.id} · ${V.pop.kind}</span>
+<span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: ${V.pop.stBg}; color: ${V.pop.stFg}"><span style="width: 6px; height: 6px; border-radius: 50%; background: ${V.pop.stFg}"></span>${V.pop.stLabel}</span>
+</div>
+<div style="font-size: 17px; font-weight: 700; margin-top: 6px; letter-spacing: -0.01em">${V.pop.name}</div>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px">
+<span style="font-family: 'Space Mono', monospace; font-size: 30px; font-weight: 700; line-height: 1">${V.pop.value}</span>
+<span style="font-size: 13px; color: #5A5F67; font-weight: 600">${V.pop.unit}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px">
+${(V.pop.mini).map((pm, $index) => html`
+<div style="background: #E2E4E8; border-radius: 10px; padding: 6px 8px">
+<div style="font-size: 10px; font-weight: 700; color: #5A5F67; text-transform: uppercase; letter-spacing: 0.05em">${pm.k}</div>
+<div style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700">${pm.v}</div>
+</div>
+`)}
+</div>
+</div>
+</div>
+
+<div class="c-glass" style="position: absolute; left: 18px; top: 18px; display: flex; gap: 4px; padding: 5px; border-radius: 999px; border: 1px solid rgba(242,243,245,0.10)">
+${(V.layers).map((ly, $index) => html`
+<button onClick=${ly.pick} aria-pressed=${ly.pressed} style="height: 38px; padding: 0 16px; border-radius: 999px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; background: ${ly.bg}; color: ${ly.fg}; display: flex; align-items: center; gap: 8px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ly.icon}></path></svg>${ly.label}
+</button>
+`)}
+</div>
+
+<div class="c-glass" style="position: absolute; right: 18px; top: 18px; display: flex; flex-direction: column; border-radius: 14px; border: 1px solid rgba(242,243,245,0.10); overflow: hidden">
+<button class="c-ghost" onClick=${V.zoomIn} aria-label="Aproximar" style="width: 44px; height: 44px; border: none; border-bottom: 1px solid rgba(242,243,245,0.08); background: transparent; color: #F2F3F5; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+<div style="height: 26px; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 10px; color: #A4A9B1; border-bottom: 1px solid rgba(242,243,245,0.08)">${V.zoomLabel}</div>
+<button class="c-ghost" onClick=${V.zoomOut} aria-label="Afastar" style="width: 44px; height: 44px; border: none; border-bottom: 1px solid rgba(242,243,245,0.08); background: transparent; color: #F2F3F5; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+<button class="c-ghost" onClick=${V.zoomReset} aria-label="Centralizar mapa" style="width: 44px; height: 44px; border: none; background: transparent; color: #F2F3F5; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button>
+</div>
+
+<div class="c-glass" style="position: absolute; left: 18px; bottom: 18px; padding: 12px 16px; border-radius: 16px; border: 1px solid rgba(242,243,245,0.10); width: 300px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px"><span style="font-size: 13px; font-weight: 600">${V.layerName}</span><span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #A4A9B1">${V.layerUnit}</span></div>
+<div style="height: 10px; border-radius: 5px; background: ${V.legendGradient}"></div>
+<div style="display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 11px; color: #A4A9B1; margin-top: 6px"><span>${V.legendLo}</span><span>${V.legendMid}</span><span>${V.legendHi}</span></div>
+</div>
+
+<div class="c-glass" style="position: absolute; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(242,243,245,0.10); font-size: 12px; color: #D3D6DB">
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: #D3D6DB"></span>Solo</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 2px; background: #D3D6DB"></span>Edifício</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 36px; height: 4px; border-left: 2px solid #D3D6DB; border-right: 2px solid #D3D6DB; border-bottom: 2px solid #D3D6DB; box-sizing: border-box"></span>500 m</span>
+<span style="display: inline-flex; align-items: center; gap: 4px; font-family: 'Space Mono', monospace; font-weight: 700; color: #F2F3F5"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l6 18-6-4-6 4z"></path></svg>N</span>
+</div>
+</section>
+
+<section aria-label="Indicadores" style="flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+${(V.kpis).map((kp, $index) => html`
+<button class="c-kpi" onClick=${kp.pick} aria-pressed=${kp.pressed} style="position: relative; overflow: hidden; text-align: left; cursor: pointer; height: 104px; box-sizing: border-box; border-radius: 20px; border: 1px solid ${kp.border}; background: ${kp.bg}; color: #F2F3F5; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="position: relative; display: flex; align-items: center; gap: 8px; width: 100%">
+<span style="width: 26px; height: 26px; border-radius: 8px; background: ${kp.iconBg}; color: ${kp.iconColor}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${kp.icon}></path></svg></span>
+<span style="color: #A4A9B1; font-size: 12px; font-weight: 600">${kp.label}</span>
+</span>
+<span style="position: relative; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 28px; line-height: 1; color: ${kp.valColor}">${kp.value}<span style="font-size: 13px; color: #A4A9B1; font-weight: 400"> ${kp.unit}</span></span>
+<span style="position: relative; color: #A4A9B1; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%">${kp.sub}</span>
+</button>
+`)}
+</section>
+</div>
+
+<aside aria-label="Estação selecionada" style="flex: none; width: 420px; box-sizing: border-box; background: #18191C; border: 1px solid #27292E; border-radius: 24px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03)">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+<div style="min-width: 0">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: 'Space Mono', monospace; font-size: 12px; color: #A4A9B1">${V.d.id}</span>
+<span style="font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: #2B2D32; color: #D3D6DB">${V.d.kind}</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: ${V.d.stBg}; color: ${V.d.stFg}"><span style="width: 6px; height: 6px; border-radius: 50%; background: ${V.d.stFg}"></span>${V.d.stLabel}</span>
+</div>
+<h2 style="margin: 8px 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${V.d.name}</h2>
+<div style="color: #A4A9B1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${V.d.place} · ${V.d.model}</div>
+</div>
+<div style="display: flex; gap: 6px; flex: none">
+<button class="c-ghost" onClick=${V.prevSensor} aria-label="Estação anterior" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #33363C; background: transparent; color: #F2F3F5; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+<button class="c-ghost" onClick=${V.nextSensor} aria-label="Próxima estação" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #33363C; background: transparent; color: #F2F3F5; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+
+<div style="position: relative; overflow: hidden; border-radius: 20px; padding: 16px 18px; background: ${V.d.heroBg}; border: 1px solid ${V.d.heroBorder}">
+<div style="color: #D3D6DB; font-size: 12px; font-weight: 600">${V.layerName} agora</div>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 4px">
+<div style="display: flex; align-items: baseline; gap: 6px">
+<span style="font-family: 'Space Mono', monospace; font-size: 54px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: ${V.d.heroColor}">${V.d.heroValue}</span>
+<span style="font-size: 16px; color: #A4A9B1; font-weight: 600">${V.layerUnit}</span>
+</div>
+<div style="text-align: right">
+<div style="font-size: 11px; color: #A4A9B1">vs. média da rede</div>
+<div style="font-family: 'Space Mono', monospace; font-weight: 700; font-size: 15px; color: ${V.d.diffColor}">${V.d.diff}</div>
+</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+${(V.d.tiles).map((tl, $index) => html`
+<div style="background: #202226; border-radius: 14px; padding: 10px 12px">
+<div style="color: #A4A9B1; font-size: 12px">${tl.label}</div>
+<div style="font-family: 'Space Mono', monospace; font-weight: 700; font-size: 18px; margin-top: 2px; color: ${tl.color}">${tl.value}<span style="font-size: 11px; color: #A4A9B1; font-weight: 400"> ${tl.unit}</span></div>
+</div>
+`)}
+</div>
+
+<div style="display: flex; align-items: center; gap: 18px; background: #202226; border-radius: 18px; padding: 12px 16px">
+<div style="position: relative; width: 88px; height: 88px; flex: none">
+<svg width="88" height="88" viewBox="0 0 88 88" aria-hidden="true">
+<circle cx="44" cy="44" r="40" fill="#141518" stroke="#33363C" stroke-width="1.5"></circle>
+<g stroke="#454950" stroke-width="1.5" stroke-linecap="round">
+<line x1="44" y1="6" x2="44" y2="10" transform="rotate(30 44 44)"></line><line x1="44" y1="6" x2="44" y2="10" transform="rotate(60 44 44)"></line>
+<line x1="44" y1="6" x2="44" y2="10" transform="rotate(120 44 44)"></line><line x1="44" y1="6" x2="44" y2="10" transform="rotate(150 44 44)"></line>
+<line x1="44" y1="6" x2="44" y2="10" transform="rotate(210 44 44)"></line><line x1="44" y1="6" x2="44" y2="10" transform="rotate(240 44 44)"></line>
+<line x1="44" y1="6" x2="44" y2="10" transform="rotate(300 44 44)"></line><line x1="44" y1="6" x2="44" y2="10" transform="rotate(330 44 44)"></line>
+</g>
+<text x="44" y="17" text-anchor="middle" fill="#F2928A" font-size="10" font-family="Space Mono, monospace" font-weight="700">N</text>
+<text x="76" y="47.5" text-anchor="middle" fill="#A4A9B1" font-size="9" font-family="Space Mono, monospace">L</text>
+<text x="44" y="78" text-anchor="middle" fill="#A4A9B1" font-size="9" font-family="Space Mono, monospace">S</text>
+<text x="12" y="47.5" text-anchor="middle" fill="#A4A9B1" font-size="9" font-family="Space Mono, monospace">O</text>
+</svg>
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #F2928A; transform: rotate(${V.d.windDeg}deg); transition: transform .6s">
+<svg width="30" height="46" viewBox="0 0 40 56" aria-hidden="true"><path d="M20 2 L30 22 L22 19 L22 54 L18 54 L18 19 L10 22 Z" fill="currentColor"></path></svg>
+</div>
+</div>
+<div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px">
+<div><div style="color: #A4A9B1; font-size: 12px">Vento</div><div style="font-family: 'Space Mono', monospace; font-weight: 700; font-size: 18px">${V.d.wind} <span style="font-size: 11px; color: #A4A9B1; font-weight: 400">m/s</span></div></div>
+<div><div style="color: #A4A9B1; font-size: 12px">Rajada</div><div style="font-family: 'Space Mono', monospace; font-weight: 700; font-size: 18px">${V.d.gust} <span style="font-size: 11px; color: #A4A9B1; font-weight: 400">m/s</span></div></div>
+<div style="grid-column: 1 / -1; font-size: 13px"><span style="color: #A4A9B1">Vindo de </span><span style="font-weight: 600">${V.d.wd} · ${V.d.windFrom}°</span></div>
+</div>
+</div>
+
+<div style="background: #202226; border-radius: 18px; padding: 14px 16px 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-weight: 600">Histórico de ${V.layerNameLower}</span>
+<span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #A4A9B1">${V.chart.lo} – ${V.chart.hi} ${V.layerUnit}</span>
+</div>
+<div onMouseMove=${V.chartMove} onMouseLeave=${V.chartLeave} style="position: relative; height: 104px; margin-top: 12px; cursor: crosshair">
+<svg viewBox="0 0 360 104" preserveAspectRatio="none" role="img" aria-label=${V.chart.aria} style="position: absolute; inset: 0; width: 100%; height: 100%">
+<line x1="0" y1="6" x2="360" y2="6" stroke="#2A2C31" stroke-width="1" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"></line>
+<line x1="0" y1="52" x2="360" y2="52" stroke="#2A2C31" stroke-width="1" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"></line>
+<line x1="0" y1="98" x2="360" y2="98" stroke="#2A2C31" stroke-width="1" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"></line>
+<polygon points=${V.chart.area} fill=${V.chartColor} fill-opacity="0.16"></polygon>
+<polyline points=${V.chart.line} fill="none" stroke=${V.chartColor} stroke-width="2.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+</svg>
+${V.chart.hasHover ? html`
+<div style="position: absolute; top: 0; bottom: 0; left: ${V.chart.hx}; width: 1px; background: #5A5F67; pointer-events: none"></div>
+<div style="position: absolute; left: ${V.chart.hx}; top: ${V.chart.hy}; width: 11px; height: 11px; border-radius: 50%; background: #0E0F11; border: 2px solid ${V.chartColor}; transform: translate(-50%, -50%); pointer-events: none"></div>
+<div style="position: absolute; left: ${V.chart.hx}; top: -10px; transform: translateX(${V.chart.tipShift}); padding: 5px 9px; border-radius: 8px; background: #F2F3F5; color: #0E0F11; pointer-events: none; white-space: nowrap; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700">${V.chart.hv} · ${V.chart.ht}</div>
+` : null}
+</div>
+<div style="display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 11px; color: #7A8089; margin-top: 6px"><span>${V.chart.t0}</span><span>agora</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+${(V.d.alerts).map((al, $index) => html`
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 12px; border-radius: 14px; background: ${al.bg}; border: 1px solid ${al.border}">
+<span style="color: ${al.fg}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"></path></svg></span>
+<span style="flex: 1; font-weight: 600; font-size: 13px">${al.title}</span>
+<button onClick=${al.ack} style="height: 30px; padding: 0 12px; border-radius: 999px; border: none; background: ${al.fg}; color: #0E0F11; font-weight: 700; font-size: 12px; cursor: pointer">Reconhecer</button>
+</div>
+`)}
+</div>
+
+<div style="flex: 1"></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+${(V.actions).map((ac, $index) => html`
+<button class="c-ghost" onClick=${ac.run} style="height: 46px; border-radius: 999px; border: ${ac.border}; background: ${ac.bg}; color: ${ac.fg}; cursor: pointer; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ac.icon}></path></svg>${ac.label}</button>
+`)}
+</div>
+</aside>
+</div>
+
+${V.hasToast ? html`
+<div class="c-toast" role="status" style="position: absolute; left: 50%; bottom: 140px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px; background: linear-gradient(90deg, #4D2A2B, #8B2B29); color: #F2F3F5; font-weight: 700; box-shadow: 0 12px 32px rgba(0,0,0,0.5)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>${V.toast}
+</div>
+` : null}
+</div>`;
+}
+
+
+const WX_SENSORS = [
+  { id: 'WS-01', name: 'Estação Campo Norte', model: 'Vaisala WXT536', kind: 'Solo', site: 'Campo Norte', place: 'Mastro, 2 m do solo', lat: -3.0981, lon: -60.0213, t: 29.4, h: 78, p: 1009.8, w: 3.2, deg: 45, rain: 0.0, bat: 96, sig: -64, offline: false },
+  { id: 'WS-02', name: 'Pluviômetro Margem do Rio', model: 'Campbell ClimaVue 50', kind: 'Solo', site: 'Margem Leste do Rio', place: 'Mastro, 3 m do solo', lat: -3.1102, lon: -59.9987, t: 28.1, h: 84, p: 1010.2, w: 2.1, deg: 90, rain: 1.2, bat: 88, sig: -71, offline: false },
+  { id: 'WS-03', name: 'Cobertura da Sede', model: 'Lufft WS600-UMB', kind: 'Edifício', site: 'Torre Sede', place: 'Cobertura, 18º andar', lat: -3.1190, lon: -60.0217, t: 31.2, h: 66, p: 1008.6, w: 6.4, deg: 30, rain: 0.0, bat: 100, sig: -58, offline: false },
+  { id: 'WS-04', name: 'Telhado do Armazém', model: 'Gill MaxiMet GMX600', kind: 'Edifício', site: 'Centro Logístico', place: 'Telhado, 3º andar', lat: -3.0749, lon: -60.0402, t: 32.0, h: 61, p: 1008.9, w: 9.6, deg: 10, rain: 0.0, bat: 100, sig: -62, offline: false },
+  { id: 'WS-05', name: 'Estação Estacionamento', model: 'Davis Vantage Pro2', kind: 'Solo', site: 'Estacionamento B', place: 'Poste, 3 m do solo', lat: -3.1255, lon: -60.0128, t: 33.5, h: 58, p: 1009.1, w: 2.8, deg: 135, rain: 0.0, bat: 74, sig: -69, offline: false },
+  { id: 'WS-06', name: 'Estação Portão Sul', model: 'Davis Vantage Pro2', kind: 'Solo', site: 'Portão Sul', place: 'Mastro, 2 m do solo', lat: -3.1342, lon: -60.0351, t: 30.7, h: 72, p: 1009.5, w: 3.9, deg: 160, rain: 0.4, bat: 18, sig: -78, offline: false },
+  { id: 'WS-07', name: 'Fachada do Laboratório', model: 'Vaisala WXT536', kind: 'Edifício', site: 'Laboratório de Pesquisa', place: 'Fachada leste, 6º andar', lat: -3.1011, lon: -60.0105, t: 30.4, h: 70, p: 1008.8, w: 4.7, deg: 70, rain: 0.0, bat: 100, sig: -60, offline: false },
+  { id: 'WS-08', name: 'Estação da Encosta', model: 'METER ATMOS 41', kind: 'Solo', site: 'Encosta Oeste', place: 'Mastro, 2 m do solo', lat: -3.0876, lon: -60.0699, t: 27.6, h: 81, p: 1010.6, w: 1.9, deg: 200, rain: 0.0, bat: 41, sig: -95, offline: true }
+];
+const WX_DIRS = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO'];
+const WX_HIST = 40;
+function wxClamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function wxN(v, n) { return v.toFixed(n).replace('.', ','); }
+function wxPad(n) { return String(n).padStart(2, '0'); }
+function wxTime(d) { return wxPad(d.getHours()) + ':' + wxPad(d.getMinutes()) + ':' + wxPad(d.getSeconds()); }
+function wxDir(deg) { return WX_DIRS[Math.round(((deg % 360) + 360) % 360 / 45) % 8]; }
+function wxFeels(t, h) { return t + 0.33 * (h / 100 * 6.105 * Math.exp(17.27 * t / (237.7 + t))) - 4; }
+function wxStatus(s) { if (s.offline) return 'offline'; if (s.bat < 25 || s.w > 9 || s.sig < -85) return 'warning'; return 'online'; }
+function wxInit(extra) {
+  const now = Date.now();
+  const times = [];
+  for (let k = 0; k < WX_HIST; k++) times.push(now - (WX_HIST - 1 - k) * 2000);
+  const sensors = WX_SENSORS.map((s, i) => {
+    const hist = { t: [], h: [], w: [], rain: [] };
+    for (let k = 0; k < WX_HIST; k++) {
+      const ph = (k + i * 3) / 5;
+      hist.t.push(s.t - 0.6 + Math.sin(ph) * 0.5 + (k / WX_HIST) * 0.6);
+      hist.h.push(s.h + 1.5 - Math.sin(ph) * 1.6 - (k / WX_HIST) * 1.5);
+      hist.w.push(Math.max(0, s.w + Math.sin(ph * 1.7) * 1.1));
+      hist.rain.push(s.rain > 0 ? Math.max(0, s.rain + Math.sin(ph) * 0.3) : 0);
+    }
+    hist.t[WX_HIST - 1] = s.t; hist.h[WX_HIST - 1] = s.h; hist.w[WX_HIST - 1] = s.w; hist.rain[WX_HIST - 1] = s.rain;
+    return Object.assign({}, s, { gust: s.w * 1.45, hist: hist, seen: s.offline ? now - 14 * 60000 : now - (i % 4) * 1000 });
+  });
+  return Object.assign({ sensors: sensors, times: times, selected: 'WS-03', paused: false, interval: 2, now: now, start: now, acked: {}, toast: '', hover: -1 }, extra || {});
+}
+function wxStep(list, now) {
+  const push = (a, v) => a.slice(1).concat([v]);
+  return list.map((s) => {
+    if (s.offline) return s;
+    const t = s.t + (Math.random() - 0.5) * 0.3;
+    const h = wxClamp(s.h + (Math.random() - 0.5) * 1.2, 30, 100);
+    const p = s.p + (Math.random() - 0.5) * 0.2;
+    const w = wxClamp(s.w + (Math.random() - 0.5) * 1.1, 0, 18);
+    const deg = s.deg + (Math.random() - 0.5) * 18;
+    const rain = s.rain > 0 ? wxClamp(s.rain + (Math.random() - 0.5) * 0.3, 0, 30) : s.rain;
+    return Object.assign({}, s, { t: t, h: h, p: p, w: w, deg: deg, rain: rain, gust: w * (1.3 + Math.random() * 0.3), seen: now, hist: { t: push(s.hist.t, t), h: push(s.hist.h, h), w: push(s.hist.w, w), rain: push(s.hist.rain, rain) } });
+  });
+}
+function wxEvents(st) {
+  const ev = [];
+  st.sensors.forEach((s) => {
+    if (s.offline) ev.push({ key: s.id + '-off', sid: s.id, title: 'Sem dados há ' + Math.round((st.now - s.seen) / 60000) + ' min', level: 'crit' });
+    if (!s.offline && s.bat < 25) ev.push({ key: s.id + '-bat', sid: s.id, title: 'Bateria baixa (' + Math.round(s.bat) + '%)', level: 'warn' });
+    if (!s.offline && s.w > 9) ev.push({ key: s.id + '-wind', sid: s.id, title: 'Vento acima de 9 m/s', level: 'warn' });
+  });
+  return ev;
+}
+function wxChart(vals, times, dec, unit, hover, W, H) {
+  const vlo = Math.min.apply(null, vals), vhi = Math.max.apply(null, vals);
+  const pad = Math.max((vhi - vlo) * 0.15, dec ? 0.2 : 1);
+  const lo = Math.max(0, vlo - pad), hi = vhi + pad;
+  const yOf = (v) => 6 + (1 - (v - lo) / (hi - lo)) * (H - 12);
+  const pts = vals.map((v, k) => (k * W / (vals.length - 1)).toFixed(1) + ',' + yOf(v).toFixed(1));
+  const hv = hover >= 0 && hover < vals.length ? hover : -1;
+  const hx = hv >= 0 ? hv * 100 / (vals.length - 1) : 0;
+  return {
+    line: pts.join(' '), area: '0,' + H + ' ' + pts.join(' ') + ' ' + W + ',' + H,
+    hi: wxN(hi, dec), lo: wxN(lo, dec),
+    t0: wxTime(new Date(times[0])),
+    hasHover: hv >= 0, hx: hx.toFixed(2) + '%', hy: hv >= 0 ? (yOf(vals[hv]) / H * 100).toFixed(2) + '%' : '0%',
+    tipShift: hx > 75 ? 'calc(-100% - 10px)' : hx < 25 ? '10px' : '-50%',
+    hv: hv >= 0 ? wxN(vals[hv], dec) + ' ' + unit : '', ht: hv >= 0 ? wxTime(new Date(times[hv])) : ''
+  };
+}
+function wxSpark(vals, W, H) {
+  const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), sp = Math.max(0.0001, hi - lo);
+  const pts = vals.map((v, k) => (k * W / (vals.length - 1)).toFixed(1) + ',' + (H - 6 - ((v - lo) / sp) * (H - 18)).toFixed(1));
+  return { line: pts.join(' '), area: '0,' + H + ' ' + pts.join(' ') + ' ' + W + ',' + H };
+}
+function cHex(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+function cMix(a, b, t) { const A = cHex(a), B = cHex(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
+function cRgba(h, a) { const c = cHex(h); return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+function cText(h) { const c = cHex(h); const l = 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]; return l < 150 ? cMix(h, '#FFFFFF', Math.min(0.6, (150 - l) / 160 + 0.25)) : h; }
+function cScale(stops, v) {
+  if (v <= stops[0][0]) return stops[0][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (v <= stops[i][0]) return cMix(stops[i - 1][1], stops[i][1], (v - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0]));
+  }
+  return stops[stops.length - 1][1];
+}
+const C_LAYERS = {
+  t: { label: 'Temperatura', unit: '°C', dec: 1, icon: 'M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0z', stops: [[26, '#D3D6DB'], [29, '#C99490'], [32, '#A53A35'], [35, '#7B2B2A']] },
+  h: { label: 'Umidade', unit: '%', dec: 0, icon: 'M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z', stops: [[50, '#A53A35'], [70, '#C99490'], [90, '#D3D6DB']] },
+  w: { label: 'Vento', unit: 'm/s', dec: 1, icon: 'M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7', stops: [[0, '#D3D6DB'], [5, '#C99490'], [9, '#A53A35'], [12, '#7B2B2A']] },
+  rain: { label: 'Chuva', unit: 'mm/h', dec: 1, icon: 'M7 18l-1 3M12 18l-1 3M17 18l-1 3M17 14a4 4 0 0 0 0-8 6 6 0 0 0-11 2 3 3 0 0 0 0 6z', stops: [[0, '#5A5F67'], [0.3, '#C9CED4'], [3, '#FFFFFF']] }
+};
+const C_ST = {
+  online: { label: 'Online', fg: '#7EE08A', bg: 'rgba(126,224,138,0.14)', popFg: '#1E7A33', popBg: '#CDEFD3' },
+  warning: { label: 'Atenção', fg: '#F2C14E', bg: 'rgba(242,193,78,0.14)', popFg: '#8A5300', popBg: '#FBE6BC' },
+  offline: { label: 'Offline', fg: '#FF7A6B', bg: 'rgba(255,122,107,0.14)', popFg: '#A3271A', popBg: '#FBD3CD' }
+};
+
+class App extends Component {
+  render() { return tpl(this.renderVals()); }
+  constructor(props) { super(props); this.state = wxInit({ layer: 't', kind: 'Todas', zoom: 1, alertsOnly: false }); }
+  componentDidMount() { this.wxSchedule(); }
+  componentWillUnmount() { if (this.wxTimer) clearInterval(this.wxTimer); if (this.wxToastT) clearTimeout(this.wxToastT); }
+  wxSchedule() { if (this.wxTimer) clearInterval(this.wxTimer); this.wxTimer = setInterval(() => this.wxTick(), (this.state.interval || 2) * 1000); }
+  wxNotify(msg) { if (this.wxToastT) clearTimeout(this.wxToastT); this.setState({ toast: msg }); this.wxToastT = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  wxTick() {
+    const now = Date.now();
+    if (this.state.paused) { this.setState({ now: now }); return; }
+    this.setState({ sensors: wxStep(this.state.sensors, now), times: this.state.times.slice(1).concat([now]), now: now });
+  }
+  renderVals() {
+    const st = this.state;
+    const all = st.sensors;
+    const live = all.filter((s) => !s.offline);
+    const L = C_LAYERS[st.layer];
+    const val = (s) => s[st.layer];
+    const select = (id) => () => this.setState({ selected: id, hover: -1 });
+    const events = wxEvents(st);
+    const active = events.filter((e) => !st.acked[e.key]);
+    const alertIds = {};
+    active.forEach((e) => { alertIds[e.sid] = true; });
+    const avgOf = (k) => live.reduce((a, s) => a + s[k], 0) / Math.max(1, live.length);
+
+    const vmax = Math.max.apply(null, live.map(val).concat([L.stops[L.stops.length - 1][0]]));
+    const visible = all
+      .filter((s) => st.kind === 'Todas' || s.kind === st.kind)
+      .filter((s) => !st.alertsOnly || alertIds[s.id]);
+    const sorted = visible.slice().sort((a, b) => (a.offline - b.offline) || (val(b) - val(a)));
+    const list = sorted.map((s, i) => {
+      const sel = s.id === st.selected;
+      const v = val(s);
+      return {
+        rank: String(i + 1).padStart(2, '0'), id: s.id, name: s.name,
+        shape: s.kind === 'Solo' ? '50%' : '2px',
+        stColor: C_ST[wxStatus(s)].fg,
+        value: s.offline ? '—' : wxN(v, L.dec), unit: L.unit,
+        valColor: s.offline ? '#666B73' : cText(cScale(L.stops, v)),
+        barW: s.offline ? '0%' : Math.round(wxClamp(v / vmax, 0.04, 1) * 100) + '%',
+        bg: sel ? '#25272B' : 'transparent', border: sel ? 'rgba(139,43,41,0.55)' : 'transparent',
+        pressed: sel ? 'true' : 'false',
+        select: select(s.id)
+      };
+    });
+    const counts = { online: 0, warning: 0, offline: 0 };
+    all.forEach((s) => { counts[wxStatus(s)]++; });
+    const netBar = ['online', 'warning', 'offline'].filter((k) => counts[k] > 0).map((k) => ({ n: counts[k], color: C_ST[k].fg, label: C_ST[k].label }));
+
+    const lats = all.map((s) => s.lat), lons = all.map((s) => s.lon);
+    const minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    const minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
+    const pos = (s) => ({ x: 10 + 72 * (s.lon - minLon) / (maxLon - minLon), y: 22 + 62 * (maxLat - s.lat) / (maxLat - minLat) });
+    const inv = (1 / st.zoom).toFixed(3);
+    const halos = visible.filter((s) => !s.offline).map((s) => {
+      const p = pos(s);
+      const c = cScale(L.stops, val(s));
+      return { x: p.x.toFixed(2) + '%', y: p.y.toFixed(2) + '%', size: '240px', bg: 'radial-gradient(circle, ' + cRgba(c, 0.32) + ' 0%, ' + cRgba(c, 0.10) + ' 42%, ' + cRgba(c, 0) + ' 70%)' };
+    });
+    const markers = visible.map((s) => {
+      const isSel = s.id === st.selected;
+      const code = wxStatus(s);
+      const p = pos(s);
+      return {
+        x: p.x.toFixed(2) + '%', y: p.y.toFixed(2) + '%', inv: inv, z: isSel ? 20 : 10,
+        value: s.offline ? 'sem sinal' : wxN(val(s), L.dec) + (st.layer === 't' ? '°' : ''),
+        fill: s.offline ? '#3E4248' : cScale(L.stops, val(s)),
+        txt: (() => { if (s.offline) return '#F2F3F5'; const c = cHex(cScale(L.stops, val(s))); return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) > 150 ? '#0E0F11' : '#F2F3F5'; })(),
+        ring: isSel ? '#F2F3F5' : (s.offline ? '#3E4248' : cScale(L.stops, val(s))),
+        h: isSel ? '40px' : '32px', padX: isSel ? '14px' : '10px', font: isSel ? '16px' : '13px',
+        shape: s.kind === 'Solo' ? '50%' : '2px',
+        alert: !!alertIds[s.id], stColor: C_ST[code].fg,
+        id: s.id, idColor: isSel ? '#F2928A' : '#D3D6DB',
+        aria: s.name + ': ' + (s.offline ? 'sem dados' : wxN(val(s), L.dec) + ' ' + L.unit) + ', ' + C_ST[code].label,
+        select: select(s.id)
+      };
+    });
+
+    const idx = Math.max(0, all.findIndex((x) => x.id === st.selected));
+    const s = all[idx];
+    const sp = pos(s);
+    const code = wxStatus(s), dash = s.offline;
+    const right = sp.x > 62;
+    const pop = {
+      x: sp.x.toFixed(2) + '%', y: sp.y.toFixed(2) + '%',
+      transform: 'translate(' + (right ? 'calc(-100% - 46px)' : '46px') + ', -78%) scale(' + inv + ')',
+      origin: right ? '100% 50%' : '0% 50%',
+      id: s.id, kind: s.kind, name: s.name,
+      stLabel: C_ST[code].label, stFg: C_ST[code].popFg, stBg: C_ST[code].popBg,
+      value: dash ? '—' : wxN(val(s), L.dec), unit: L.unit,
+      mini: [
+        { k: 'Temp.', v: dash ? '—' : wxN(s.t, 1) + '°' },
+        { k: 'Umid.', v: dash ? '—' : Math.round(s.h) + '%' },
+        { k: 'Vento', v: dash ? '—' : wxN(s.w, 1) }
+      ]
+    };
+    const zoomOrigin = sp.x.toFixed(1) + '% ' + sp.y.toFixed(1) + '%';
+
+    const layers = Object.keys(C_LAYERS).map((k) => ({
+      label: C_LAYERS[k].label, icon: C_LAYERS[k].icon, pressed: st.layer === k ? 'true' : 'false',
+      bg: st.layer === k ? 'linear-gradient(90deg, #4D2A2B, #8B2B29)' : 'transparent', fg: st.layer === k ? '#F2F3F5' : '#D3D6DB',
+      pick: () => this.setState({ layer: k, hover: -1 })
+    }));
+    const stops = L.stops;
+    const legendGradient = 'linear-gradient(90deg, ' + stops.map((s2, i) => s2[1] + ' ' + Math.round(i * 100 / (stops.length - 1)) + '%').join(', ') + ')';
+    const fmtStop = (v) => (Number.isInteger(v) ? String(v) : wxN(v, 1));
+
+    const avgHist = (k, sum) => st.times.map((_, i) => { const t = live.reduce((a, x) => a + x.hist[k][i], 0); return sum ? t : t / Math.max(1, live.length); });
+    const windiest = live.reduce((m, x) => (x.w > m.w ? x : m), live[0]);
+    const rainSum = live.reduce((a, x) => a + x.rain, 0);
+    const kpiBtn = (k, o, arr) => {
+      const on = st.layer === k && !st.alertsOnly;
+      const spk = wxSpark(arr, 200, 60);
+      const c = cScale(C_LAYERS[k].stops, (C_LAYERS[k].stops[1][0] + C_LAYERS[k].stops[C_LAYERS[k].stops.length - 1][0]) / 2);
+      return Object.assign(o, {
+        pressed: on ? 'true' : 'false', line: spk.line, area: spk.area, spark: c,
+        border: on ? 'rgba(139,43,41,0.6)' : '#27292E', bg: on ? '#202226' : '#18191C',
+        iconColor: on ? '#F2F3F5' : c, iconBg: on ? 'linear-gradient(90deg, #4D2A2B, #8B2B29)' : cRgba(c, 0.14), icon: C_LAYERS[k].icon, valColor: '#F2F3F5',
+        pick: () => this.setState({ layer: k, hover: -1, alertsOnly: false })
+      });
+    };
+    const kpis = [
+      kpiBtn('t', { label: 'Temperatura média', value: wxN(avgOf('t'), 1), unit: '°C', sub: 'Máx. ' + wxN(Math.max.apply(null, live.map((x) => x.t)), 1) + ' °C' }, avgHist('t')),
+      kpiBtn('h', { label: 'Umidade média', value: wxN(avgOf('h'), 0), unit: '%', sub: 'Pressão ' + wxN(avgOf('p'), 1) + ' hPa' }, avgHist('h')),
+      kpiBtn('w', { label: 'Vento máximo', value: wxN(windiest.w, 1), unit: 'm/s', sub: windiest.name }, st.times.map((_, i) => Math.max.apply(null, live.map((x) => x.hist.w[i])))),
+      kpiBtn('rain', { label: 'Chuva na rede', value: wxN(rainSum, 1), unit: 'mm/h', sub: live.filter((x) => x.rain > 0).length + ' estação(ões) com chuva' }, avgHist('rain', true)),
+      {
+        label: 'Alertas ativos', value: String(active.length), unit: '', sub: st.alertsOnly ? 'Filtrando o mapa · clique p/ limpar' : 'Clique para filtrar o mapa',
+        pressed: st.alertsOnly ? 'true' : 'false', border: st.alertsOnly ? 'rgba(242,193,78,0.7)' : '#27292E', bg: st.alertsOnly ? '#211D11' : '#18191C',
+        iconColor: '#F2C14E', iconBg: 'rgba(242,193,78,0.14)', icon: 'M12 3l10 18H2zM12 10v5M12 18h.01', valColor: active.length ? '#F2C14E' : '#7EE08A',
+        line: '', area: '', spark: '#F2C14E',
+        pick: () => this.setState({ alertsOnly: !st.alertsOnly })
+      }
+    ];
+
+    const f = (v, n) => (dash ? '—' : wxN(v, n));
+    const heroC = dash ? '#666B73' : cScale(L.stops, val(s));
+    const diff = dash ? 0 : val(s) - avgOf(st.layer);
+    const d = {
+      id: s.id, name: s.name, place: s.place, model: s.model, kind: s.kind,
+      stLabel: C_ST[code].label, stFg: C_ST[code].fg, stBg: C_ST[code].bg,
+      heroValue: f(val(s), L.dec), heroColor: dash ? heroC : cText(heroC),
+      heroBg: 'linear-gradient(135deg, ' + cRgba(heroC, 0.16) + ', ' + cRgba(heroC, 0.03) + ')', heroBorder: cRgba(heroC, 0.30),
+      diff: dash ? '—' : (diff >= 0 ? '+' : '−') + wxN(Math.abs(diff), L.dec) + ' ' + L.unit,
+      diffColor: dash ? '#A4A9B1' : Math.abs(diff) < 0.05 ? '#A4A9B1' : diff > 0 ? '#F2C14E' : '#F2928A',
+      tiles: [
+        { label: 'Temperatura', value: f(s.t, 1), unit: '°C', color: dash ? '#666B73' : cText(cScale(C_LAYERS.t.stops, s.t)) },
+        { label: 'Sensação', value: dash ? '—' : wxN(wxFeels(s.t, s.h), 1), unit: '°C', color: '#F2F3F5' },
+        { label: 'Umidade', value: f(s.h, 0), unit: '%', color: '#F2F3F5' },
+        { label: 'Pressão', value: f(s.p, 1), unit: 'hPa', color: '#F2F3F5' },
+        { label: 'Chuva', value: f(s.rain, 1), unit: 'mm/h', color: !dash && s.rain > 0 ? '#FFFFFF' : '#F2F3F5' },
+        { label: 'Bateria', value: Math.round(s.bat) + '', unit: '%', color: s.bat < 25 ? '#FF7A6B' : s.bat < 50 ? '#F2C14E' : '#7EE08A' }
+      ],
+      wind: f(s.w, 1), gust: f(s.gust, 1), wd: dash ? '—' : wxDir(s.deg),
+      windFrom: dash ? '—' : Math.round(((s.deg % 360) + 360) % 360), windDeg: Math.round(s.deg + 180),
+      alerts: active.filter((e) => e.sid === s.id).map((e) => ({
+        title: e.title, fg: e.level === 'crit' ? '#FF7A6B' : '#F2C14E',
+        bg: e.level === 'crit' ? 'rgba(255,122,107,0.10)' : 'rgba(242,193,78,0.10)',
+        border: e.level === 'crit' ? 'rgba(255,122,107,0.35)' : 'rgba(242,193,78,0.35)',
+        ack: () => { this.setState({ acked: Object.assign({}, st.acked, { [e.key]: true }) }); this.wxNotify('Alerta de ' + e.sid + ' reconhecido'); }
+      }))
+    };
+    const chart = Object.assign(wxChart(s.hist[st.layer], st.times, L.dec, L.unit, dash ? -1 : st.hover, 360, 104), { aria: 'Gráfico de ' + L.label + ' de ' + s.id });
+    const go = (dir) => () => this.setState({ selected: all[(idx + dir + all.length) % all.length].id, hover: -1 });
+    const todayStr = new Date(st.now).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    const z = st.zoom;
+    return {
+      today: todayStr.charAt(0).toUpperCase() + todayStr.slice(1) + ' · 8 estações no solo e em edificações',
+      clock: wxTime(new Date(st.now)),
+      liveLabel: st.paused ? 'Pausado' : 'Ao vivo', liveDot: st.paused ? '#A4A9B1' : '#F2928A', liveClass: st.paused ? '' : 'c-live',
+      pauseLabel: st.paused ? 'Retomar' : 'Pausar', pauseIcon: st.paused ? 'M7 4l12 8-12 8z' : 'M8 5v14M16 5v14',
+      togglePause: () => this.setState({ paused: !st.paused }),
+      intervals: [1, 2, 5].map((n) => ({
+        label: n + 's', pressed: st.interval === n ? 'true' : 'false',
+        bg: st.interval === n ? 'linear-gradient(90deg, #4D2A2B, #8B2B29)' : 'transparent', fg: st.interval === n ? '#F2F3F5' : '#D3D6DB',
+        pick: () => this.setState({ interval: n }, () => this.wxSchedule())
+      })),
+      layerName: L.label, layerNameLower: L.label.toLowerCase(), layerUnit: L.unit,
+      kindFilters: ['Todas', 'Solo', 'Edifício'].map((k) => ({
+        label: k, pressed: st.kind === k ? 'true' : 'false',
+        bg: st.kind === k ? '#F2F3F5' : 'transparent', fg: st.kind === k ? '#0E0F11' : '#D3D6DB',
+        pick: () => this.setState({ kind: k })
+      })),
+      list: list, netBar: netBar, netLabel: counts.online + '/' + all.length + ' online',
+      halos: halos, markers: markers, pop: pop, layers: layers,
+      zoom: z, zoomOrigin: zoomOrigin, zoomLabel: Math.round(z * 100) + '%',
+      zoomIn: () => this.setState({ zoom: Math.min(2, +(z + 0.25).toFixed(2)) }),
+      zoomOut: () => this.setState({ zoom: Math.max(1, +(z - 0.25).toFixed(2)) }),
+      zoomReset: () => this.setState({ zoom: 1 }),
+      legendGradient: legendGradient,
+      legendLo: fmtStop(stops[0][0]), legendMid: fmtStop(stops[Math.floor(stops.length / 2)][0]), legendHi: fmtStop(stops[stops.length - 1][0]) + '+',
+      kpis: kpis, d: d, chart: chart, chartColor: heroC === '#666B73' ? '#A4A9B1' : heroC,
+      chartMove: (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        if (!r.width) return;
+        const i = Math.round(wxClamp((e.clientX - r.left) / r.width, 0, 1) * (WX_HIST - 1));
+        if (i !== st.hover) this.setState({ hover: i });
+      },
+      chartLeave: () => this.setState({ hover: -1 }),
+      prevSensor: go(-1), nextSensor: go(1),
+      actions: [
+        { label: 'Ler agora', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z', bg: 'linear-gradient(90deg, #4D2A2B, #8B2B29)', fg: '#F2F3F5', border: 'none', run: () => { this.wxTick(); this.wxNotify('Leitura solicitada a ' + s.id); } },
+        { label: 'Calibrar', icon: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M16 4v4M10 10v4', bg: 'transparent', fg: '#F2F3F5', border: '1px solid #474B52', run: () => this.wxNotify('Calibração agendada para ' + s.id) },
+        { label: 'Reiniciar', icon: 'M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5', bg: 'transparent', fg: '#F2F3F5', border: '1px solid #474B52', run: () => this.wxNotify('Reinício enviado para ' + s.id) }
+      ],
+      hasToast: !!st.toast, toast: st.toast
+    };
+  }
+}
+
+
+render(html`<${App} />`, document.getElementById('stage'));
+
+function fit() {
+  var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  document.getElementById('stage').style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+}
+window.addEventListener('resize', fit);
+fit();
+})();
+</script>
+</body>
+</html>
